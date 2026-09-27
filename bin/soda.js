@@ -8,6 +8,7 @@ import path from 'node:path';
 import { exampleHelp, runExample } from './examples.js';
 import { runTheme, themeHelp } from './theme.js';
 import { checkHelp, compileHelp, overviewHelp } from './help.js';
+import { writeHelp } from './terminal.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
@@ -21,7 +22,7 @@ function showHelp(topics = []) {
   if (topics.length > 1 || (topics.length && !pages.has(topics[0]))) {
     throw new Error('帮助主题请选择 compile、theme、example 或 check；运行 soda help 查看总览。');
   }
-  process.stdout.write(topics.length ? pages.get(topics[0]) : overviewHelp(version));
+  writeHelp(topics.length ? pages.get(topics[0]) : overviewHelp(version));
 }
 
 function wantsHelp(argv) {

@@ -4,6 +4,7 @@ import { createReadStream } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { writeHelp } from './terminal.js';
 
 const examples = new Set(['quickstart', 'showcase']);
 export const exampleHelp = `SODA · 范例帮助
@@ -80,7 +81,7 @@ export async function runExample(packageRoot, argv) {
     'no-open': { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
   } });
   if (values.help) {
-    process.stdout.write(exampleHelp);
+    writeHelp(exampleHelp);
     return;
   }
   const name = positionals[0];

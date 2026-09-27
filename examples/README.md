@@ -22,6 +22,8 @@ soda help theme           # 生成、修改并应用自定义主题
 
 也可用 `soda --help`、`soda compile --help`、`soda theme --help`。所有帮助都可离线查看，无需 Python。
 
+终端中的帮助会自动着色，重定向或管道输出默认为纯文本。用 `NO_COLOR=1 soda help` 关闭颜色，`FORCE_COLOR=1 soda help` 强制开启；显式设置的 `FORCE_COLOR` 优先。
+
 **编译自己的稿件**还需要 Python 3.12+，不必额外 `pip install`。CLI 自动查找 Python，也可以用 `SODA_PYTHON` 指定可执行文件路径。公式和 `.typ` 插图另需 Typst；场景打包工具 esbuild 已由 npm 安装。
 
 ## 2. 看范例

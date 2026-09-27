@@ -8,6 +8,7 @@
 | :--- | :--- |
 | npm 命令、Python 查找与启动 | `bin/soda.js` |
 | 总览与编译帮助 | `bin/help.js` |
+| 帮助配色与终端检测 | `bin/terminal.js` |
 | 范例浏览和源码复制 | `bin/examples.js`、`examples/index.html` |
 | 主题说明与配置生成 | `bin/theme.js`、`examples/reference.md` |
 | Python API、编译参数 | `src/soda/api.py`、`cli.py` |
@@ -20,6 +21,8 @@
 npm 包携带 Python 源码，启动器调用本机 Python，直接加载随包编译器，不安装 Python 依赖、不使用安装脚本构建范例。esbuild 是 npm 依赖；`soda example` 的预览和复制、`soda theme` 的说明和配置生成直接由 Node.js 提供。
 
 安装说明使用 `npm install … && soda help`，在成功后直接显示总览。SODA 不添加安装生命周期脚本，避免 npm 在安装 Git 包时额外执行准备流程。主题帮助由 `bin/theme.js` 提供，`soda help theme` 与 `soda theme --help` 共用一份内容。
+
+帮助统一通过 `writeHelp()` 输出，使用终端的基础 ANSI 色板，不添加依赖。TTY 默认着色，管道、重定向和 `TERM=dumb` 默认纯文本；支持 `NO_COLOR`、`FORCE_COLOR`。着色不改变原文、空格或换行。
 
 Markdown 决定内容和布局，`.soda` 引用已有对象安排动作。编译器将动作转换为绝对时间区间，播放器按当前时间求画面，因此可以回退和任意跳转。`src/soda/vendor/` 是随包携带的 Zanim Web 运行时及许可。
 

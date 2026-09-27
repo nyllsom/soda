@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { writeHelp } from './terminal.js';
 
 export const themeHelp = `SODA · 自定义主题帮助
 
@@ -45,16 +46,16 @@ export async function runTheme(packageRoot, argv) {
     from: { type: 'string' }, reference: { type: 'boolean' },
     help: { type: 'boolean', short: 'h' },
   } });
-  if (values.help) { process.stdout.write(themeHelp); return; }
+  if (values.help) { writeHelp(themeHelp); return; }
   if (values.reference) {
     if (positionals.length || values.from) throw new Error('--reference 不与 init 或 --from 同时使用。');
     const reference = await readFile(path.join(packageRoot, 'examples/reference.md'), 'utf8');
     const section = reference.split('\n## 自定义主题\n')[1];
     if (!section) throw new Error('安装包中的主题说明不完整，请重新安装 SODA。');
-    console.log(`SODA · 自定义主题\n${section.split('\n## ')[0]}`);
+    writeHelp(`SODA · 自定义主题\n${section.split('\n## ')[0]}\n`);
     return;
   }
-  if (!positionals.length && !values.from) { process.stdout.write(themeHelp); return; }
+  if (!positionals.length && !values.from) { writeHelp(themeHelp); return; }
   if (positionals[0] !== 'init' || positionals.length > 2) throw new Error('用 soda theme 查看写法，或用 soda theme init [theme.json] 生成配置。');
   const parent = values.from || 'nju';
   if (!['nju', 'ipads'].includes(parent)) throw new Error('--from 请选择 nju 或 ipads。');
