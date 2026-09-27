@@ -7,7 +7,7 @@
 | 想改什么 | 代码位置 |
 | :--- | :--- |
 | npm 命令、Python 查找与启动 | `bin/soda.js` |
-| 总览与编译帮助、安装提示 | `bin/help.js`、`bin/postinstall.js` |
+| 总览与编译帮助 | `bin/help.js` |
 | 范例浏览和源码复制 | `bin/examples.js`、`examples/index.html` |
 | 主题说明与配置生成 | `bin/theme.js`、`examples/reference.md` |
 | Python API、编译参数 | `src/soda/api.py`、`cli.py` |
@@ -19,7 +19,7 @@
 
 npm 包携带 Python 源码，启动器调用本机 Python，直接加载随包编译器，不安装 Python 依赖、不使用安装脚本构建范例。esbuild 是 npm 依赖；`soda example` 的预览和复制、`soda theme` 的说明和配置生成直接由 Node.js 提供。
 
-`postinstall` 只输出帮助入口，不访问网络、不改配置、不调用 Python。npm 默认可能隐藏脚本输出，文档中的安装命令使用 `--foreground-scripts`；直接运行 `soda` 始终显示总览。主题帮助由 `bin/theme.js` 提供，`soda help theme` 与 `soda theme --help` 共用一份内容。
+安装说明使用 `npm install … && soda help`，在成功后直接显示总览。SODA 不添加安装生命周期脚本，避免 npm 在安装 Git 包时额外执行准备流程。主题帮助由 `bin/theme.js` 提供，`soda help theme` 与 `soda theme --help` 共用一份内容。
 
 Markdown 决定内容和布局，`.soda` 引用已有对象安排动作。编译器将动作转换为绝对时间区间，播放器按当前时间求画面，因此可以回退和任意跳转。`src/soda/vendor/` 是随包携带的 Zanim Web 运行时及许可。
 
@@ -54,6 +54,6 @@ python -m build
 
 `npm pack` 生成 `.tgz`，Python 构建在 `dist/` 生成 wheel。分发前，在仓库外用临时 npm 安装目录检查 CLI、范例预览、源码复制和实际导出；打包内容必须包含两个主题、标识及 Zanim WASM，不能包含虚拟环境和构建工具二进制。
 
-版本号在 `package.json`、`pyproject.toml`、`src/soda/_version.py` 中保持一致。推送到 GitHub 后，可用 `npm install -g --foreground-scripts git+https://github.com/nyllsom/soda.git` 安装；公开仓库无需 SSH 密钥。本项目当前通过 Git 分发，不需要向 npm registry 发布。
+版本号在 `package.json`、`pyproject.toml`、`src/soda/_version.py` 中保持一致。推送到 GitHub 后，可用 `npm install -g git+https://github.com/nyllsom/soda.git && soda help` 安装并查看用法；公开仓库无需 SSH 密钥。本项目当前通过 Git 分发，不需要向 npm registry 发布。
 
 提交信息使用 Conventional Commits，例如 `feat(cli): add topic help`。

@@ -71,12 +71,3 @@ Markdown 和动画路径相对当前工作目录；资源路径相对 Markdown�
 检查需要 Python 3.12+。最终排版请编译后在浏览器按 D 检查。
 导出与依赖：soda help compile
 `;
-
-export function installationHint(version, command = 'soda') {
-  return `SODA ${version} 已安装。
-  使用总览：${command} help
-  编译帮助：${command} help compile
-  自定义主题：${command} help theme
-  查看范例：${command} example
-`;
-}

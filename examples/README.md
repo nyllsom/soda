@@ -7,13 +7,12 @@
 准备 Node.js 20+ 和 Git，然后通过 HTTPS 从公开仓库安装：
 
 ```bash
-npm install -g --foreground-scripts git+https://github.com/nyllsom/soda.git
-soda help
+npm install -g git+https://github.com/nyllsom/soda.git && soda help
 ```
 
-公开仓库无需 GitHub 账号或 SSH 密钥。npm 使用 `git+https://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。若只想安装到当前项目，可去掉 `-g`，随后用 `npx soda …` 执行下面的命令。
+公开仓库无需 GitHub 账号或 SSH 密钥。npm 使用 `git+https://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。上面的命令在安装成功后自动显示使用总览，列出编译、主题和范例的入口。升级也执行这条命令。
 
-安装完成会提示帮助入口。`--foreground-scripts` 让 npm 显示安装脚本的提示；npm 默认可能隐藏它（见 [npm 配置说明](https://docs.npmjs.com/cli/v11/using-npm/config/#foreground-scripts)）。提示脚本只输出文字；即使没有看到提示，直接运行 `soda` 或 `soda help` 都能查看总览。
+若只想安装到当前项目，运行 `npm install git+https://github.com/nyllsom/soda.git && npx soda help`，随后用 `npx soda …` 执行下面的命令。已经安装但没有看到说明时，运行 `soda` 或 `soda help` 即可。
 
 ```bash
 soda help                 # 整体用法与最短工作流

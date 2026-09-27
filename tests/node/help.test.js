@@ -1,8 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,23 +43,5 @@ test('invalid help topics fail with guidance instead of invoking Python', () => 
     assert.equal(result.status, 1);
     assert.match(result.stderr, /soda help/);
     assert.doesNotMatch(result.stderr, /SODA_PYTHON|Traceback/);
-  }
-});
-
-test('installation hints use commands appropriate to global, local and source installs', t => {
-  const cwd = mkdtempSync(path.join(tmpdir(), 'soda-install-hint-'));
-  t.after(() => rmSync(cwd, { recursive: true, force: true }));
-  const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
-  for (const [global, initial, command] of [
-    ['true', root, 'soda'], ['false', cwd, 'npx soda'], ['false', root, 'node bin/soda.js'],
-  ]) {
-    const result = spawnSync(process.execPath, [path.join(root, 'bin/postinstall.js')], {
-      cwd, encoding: 'utf8', env: { ...noPython, npm_config_global: global, INIT_CWD: initial },
-    });
-    assert.equal(result.status, 0, result.stderr);
-    assert.ok(result.stdout.includes(`SODA ${version} 已安装`));
-    assert.ok(result.stdout.includes(`使用总览：${command} help`));
-    assert.ok(result.stdout.includes(`编译帮助：${command} help compile`));
-    assert.ok(result.stdout.includes(`自定义主题：${command} help theme`));
   }
 });
