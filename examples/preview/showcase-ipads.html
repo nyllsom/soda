@@ -210,6 +210,7 @@ ul,ol{padding-left:1.4rem;margin:0;font-size:1.08rem;line-height:1.35}blockquote
   background:var(--soda-background);font-size:24px;line-height:1.4;
 }
 .layout-academic :is(.academic-table,.kind-table) :is(th,td) {
+  /* Keep the outer rules extending beyond the first and last cell text. */
   padding:12px 24px;vertical-align:top;
   border-bottom:1px solid var(--soda-table-divider);overflow-wrap:break-word;
   font-variant-numeric:tabular-nums;
@@ -218,8 +219,6 @@ ul,ol{padding-left:1.4rem;margin:0;font-size:1.08rem;line-height:1.35}blockquote
   background:transparent;color:var(--soda-primary);font-weight:600;
   border-bottom:1px solid var(--soda-border);
 }
-.layout-academic :is(.academic-table,.kind-table) :is(th,td):first-child { padding-left:0; }
-.layout-academic :is(.academic-table,.kind-table) :is(th,td):last-child { padding-right:0; }
 .layout-academic .kind-table.wide { width:100%; }
 .layout-academic .media-object img,.layout-academic .media-object video {
   height:320px;border-radius:2px;background:transparent;

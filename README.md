@@ -11,6 +11,6 @@
 - **编译与主题**：`soda help compile` 查看编译用法，`soda help theme` 查看自定义主题。
 - **修改编译器**：[开发说明](CONTRIBUTING.md)。
 
-当前为 `0.1.3` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
+当前为 `0.1.4` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
 
 采用 [MIT 许可](LICENSE)。
