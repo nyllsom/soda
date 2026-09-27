@@ -5,14 +5,15 @@ import pytest
 from soda.cli import main
 
 
-def test_shorthand_discovers_motion_and_writes_next_to_markdown(tmp_path, monkeypatch):
+@pytest.mark.parametrize("command", [[], ["compile"], ["html"]])
+def test_compile_forms_discover_motion_and_write_next_to_markdown(tmp_path, monkeypatch, command):
     talk = tmp_path / "我的 演示"
     talk.mkdir()
     source = talk / "deck.md"
     source.write_text("## 结果 {#result}\n结论。 {#finding}\n")
     source.with_suffix(".soda").write_text("motion result { finding.fade_in(duration = 400ms); }")
     monkeypatch.chdir(tmp_path)
-    assert main([str(source)]) == 0
+    assert main([*command, str(source)]) == 0
     html = source.with_suffix(".html").read_text()
     assert '"end": 0.4' in html
     assert 'theme-nju' in html

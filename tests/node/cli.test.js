@@ -16,7 +16,7 @@ test('help and version do not require Python', () => {
   assert.equal(help.status, 0);
   assert.match(help.stdout, /soda <deck.md>/);
   assert.match(help.stdout, /soda example/);
-  assert.match(help.stdout, /soda theme/);
+  assert.match(help.stdout, /soda help theme/);
   const version = run(['--version'], { env });
   const metadata = JSON.parse(readFileSync(path.join(root, 'package.json')));
   assert.equal(version.stdout.trim(), `SODA ${metadata.version}`);
@@ -40,7 +40,7 @@ test('installed-style launcher handles paths with spaces and explicit animation'
   const motion = path.join(cwd, '动画.soda');
   writeFileSync(source, '## 结果 {#result}\n结论。 {#finding}\n');
   writeFileSync(motion, 'motion result { finding.fade_in(duration = 250ms); }');
-  const result = run([source, motion, '-o', '输出/演示.html', '--theme', 'ipads'], { cwd });
+  const result = run(['compile', source, motion, '-o', '输出/演示.html', '--theme', 'ipads'], { cwd });
   assert.equal(result.status, 0, result.stderr);
   const html = readFileSync(path.join(cwd, '输出/演示.html'), 'utf8');
   assert.match(html, /theme-ipads/);

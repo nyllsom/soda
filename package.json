@@ -1,6 +1,6 @@
 {
   "name": "@nyllsom/soda",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "用 Markdown 与声明式动画制作可分享的 HTML 演示",
   "license": "MIT",
   "type": "module",
@@ -24,6 +24,7 @@
     "CONTRIBUTING.md"
   ],
   "scripts": {
+    "postinstall": "node bin/postinstall.js",
     "test": "node --test tests/node/*.test.js",
     "examples:build": "node bin/soda.js examples/quickstart/deck.md -o examples/preview/quickstart-nju.html && node bin/soda.js examples/quickstart/deck.md --theme ipads -o examples/preview/quickstart-ipads.html && node bin/soda.js examples/showcase/deck.md -o examples/preview/showcase-nju.html && node bin/soda.js examples/showcase/deck.md --theme ipads -o examples/preview/showcase-ipads.html"
   },

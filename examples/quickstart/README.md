@@ -27,6 +27,6 @@ soda deck.md
 
 这个例子的编译只需 Python 3.12+，无需 Typst。默认 NJU，换主题用 `soda deck.md --theme ipads`。
 
-想改颜色或标识，运行 `soda theme` 查看中文写法，`soda theme init` 生成 `theme.json`。改完后用 `soda deck.md --theme theme.json` 应用；字段表可离线运行 `soda theme --reference` 查看。
+编译细节见 `soda help compile`。想改颜色或标识，运行 `soda help theme` 查看中文写法，`soda theme init` 生成 `theme.json`。改完后用 `soda deck.md --theme theme.json` 应用；字段表可离线运行 `soda theme --reference` 查看。
 
 如需 Python API，[build.py](build.py) 展示对应调用；公式、媒体和更多转场见 [完整展示](https://github.com/nyllsom/soda/blob/main/examples/showcase/README.md)。

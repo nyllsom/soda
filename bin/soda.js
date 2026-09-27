@@ -5,42 +5,29 @@ import { createRequire } from 'node:module';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { runExample } from './examples.js';
-import { runTheme } from './theme.js';
+import { exampleHelp, runExample } from './examples.js';
+import { runTheme, themeHelp } from './theme.js';
+import { checkHelp, compileHelp, overviewHelp } from './help.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
 const args = process.argv.slice(2);
 
-const help = `SODA ${version} · Markdown 演示编译器
+function showHelp(topics = []) {
+  const pages = new Map([
+    ['compile', compileHelp], ['html', compileHelp], ['theme', themeHelp],
+    ['example', exampleHelp], ['check', checkHelp],
+  ]);
+  if (topics.length > 1 || (topics.length && !pages.has(topics[0]))) {
+    throw new Error('帮助主题请选择 compile、theme、example 或 check；运行 soda help 查看总览。');
+  }
+  process.stdout.write(topics.length ? pages.get(topics[0]) : overviewHelp(version));
+}
 
-  soda <deck.md> [motion.soda] [-o output.html]
-  soda check <deck.md> [motion.soda]
-  soda example [quickstart|showcase] [--theme nju|ipads]
-  soda example [quickstart|showcase] --copy <目录>
-  soda theme                           查看主题写法（离线中文说明）
-  soda theme init [theme.json] [--from nju|ipads]
-
-编译：
-  省略动画文件时自动读取同名 .soda；省略输出时生成同目录同名 .html。
-  -o, --output <文件>    输出路径
-  --theme <名称或JSON>   nju（默认）、ipads 或项目主题 JSON
-                        自定义主题从 soda theme 开始
-  --static              忽略同名动画
-  --target portable|web 单文件 HTML（默认）或 HTML + assets/
-
-范例：
-  soda example          打开范例目录；无需 Python 或 Typst
-  --no-open             只显示本地预览地址
-  --port <端口>         默认自动选择空闲端口；Ctrl+C 结束预览
-  --copy <目录>         复制可编辑源码；默认 quickstart，不覆盖已有目录
-
-  -h, --help            查看帮助
-  -v, --version         查看版本
-
-编译稿件需要 Python 3.12+；公式需要 Typst。SODA_PYTHON 可指定 Python 路径。
-使用说明：https://github.com/nyllsom/soda/tree/main/examples
-`;
+function wantsHelp(argv) {
+  const end = argv.indexOf('--');
+  return argv.slice(0, end < 0 ? argv.length : end).some(arg => ['--help', '-h'].includes(arg));
+}
 
 function pythonCommand() {
   const configured = process.env.SODA_PYTHON;
@@ -94,10 +81,14 @@ function compile() {
 }
 
 try {
-  if (!args.length || ['--help', '-h', 'help'].includes(args[0])) process.stdout.write(help);
+  if (!args.length) showHelp();
+  else if (['--help', '-h', 'help'].includes(args[0])) showHelp(args.slice(1));
   else if (['--version', '-v'].includes(args[0])) console.log(`SODA ${version}`);
   else if (args[0] === 'example') await runExample(root, args.slice(1));
   else if (args[0] === 'theme') await runTheme(root, args.slice(1));
+  else if (wantsHelp(args) || (args.length === 1 && ['compile', 'html', 'check'].includes(args[0]))) {
+    showHelp([args[0] === 'check' ? 'check' : 'compile']);
+  }
   else compile();
 } catch (error) {
   console.error(`soda: ${error.message}`);

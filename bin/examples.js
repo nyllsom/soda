@@ -6,6 +6,22 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 const examples = new Set(['quickstart', 'showcase']);
+export const exampleHelp = `SODA · 范例帮助
+
+  soda example                              打开范例目录
+  soda example showcase --theme ipads        直接查看某个范例和主题
+  soda example quickstart --copy my-talk     复制可编辑源码
+
+范例：quickstart（四页入门）、showcase（十四页完整展示）。
+预览与复制无需 Python；复制时省略名称默认 quickstart，不覆盖已有目录。
+进入复制的目录后运行 soda deck.md；编译细节见 soda help compile。
+
+预览选项：
+  --theme nju|ipads   选择预生成的主题；需同时指定范例名
+  --no-open          只显示预览地址，不自动打开浏览器
+  --port <端口>      默认自动选择空闲端口；Ctrl+C 关闭本地服务
+--copy 不与预览选项同时使用。自定义主题见 soda help theme。
+`;
 const types = {
   '.html': 'text/html; charset=utf-8', '.md': 'text/plain; charset=utf-8',
   '.soda': 'text/plain; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -64,7 +80,7 @@ export async function runExample(packageRoot, argv) {
     'no-open': { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
   } });
   if (values.help) {
-    console.log('soda example [quickstart|showcase] [--theme nju|ipads] [--port 端口] [--no-open]\nsoda example [quickstart|showcase] --copy 目录\n省略示例名打开目录；复制时默认 quickstart。');
+    process.stdout.write(exampleHelp);
     return;
   }
   const name = positionals[0];
@@ -88,7 +104,7 @@ export async function runExample(packageRoot, argv) {
         filter: item => !item.split(path.sep).includes('__pycache__') && !/\.py[co]$/.test(item),
       });
     }
-    console.log(`已复制 ${name || 'quickstart'} 到 ${destination}\n进入该目录后运行：soda deck.md\n自定义主题：soda theme 查看写法，soda theme init 生成配置。`);
+    console.log(`已复制 ${name || 'quickstart'} 到 ${destination}\n进入该目录后运行：soda deck.md；编译帮助：soda help compile\n自定义主题：soda help theme 查看写法，soda theme init 生成配置。`);
     return;
   }
   if (values.theme && !name) throw new Error('指定主题时请同时选择示例，例如 soda example showcase --theme ipads。');

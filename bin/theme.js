@@ -2,14 +2,18 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-const help = `SODA · 主题写法
+export const themeHelp = `SODA · 自定义主题帮助
 
   soda deck.md --theme ipads          切换内置主题：nju（默认）或 ipads
   soda theme init                    在当前目录生成 theme.json
   soda theme init themes/lab.json --from ipads
   soda theme --reference             离线查看全部字段和素材换色说明
 
-生成后，修改需要的字段，再运行 soda deck.md --theme theme.json：
+在 Markdown 所在目录生成配置，修改需要的字段，再编译：
+  soda theme init
+  soda deck.md --theme theme.json
+
+例如，编辑 theme.json：
 
   {
     "extends": "nju",
@@ -33,6 +37,7 @@ const help = `SODA · 主题写法
 也可在 Markdown 开头的 --- 配置区写 theme: theme.json，省去每次传参。
 
 查看说明、生成配置无需 Python；生成时不会覆盖已有文件。
+soda help theme 与 soda theme --help 都可查看本页；编译细节见 soda help compile。
 `;
 
 export async function runTheme(packageRoot, argv) {
@@ -40,7 +45,7 @@ export async function runTheme(packageRoot, argv) {
     from: { type: 'string' }, reference: { type: 'boolean' },
     help: { type: 'boolean', short: 'h' },
   } });
-  if (values.help) { console.log(help); return; }
+  if (values.help) { process.stdout.write(themeHelp); return; }
   if (values.reference) {
     if (positionals.length || values.from) throw new Error('--reference 不与 init 或 --from 同时使用。');
     const reference = await readFile(path.join(packageRoot, 'examples/reference.md'), 'utf8');
@@ -49,7 +54,7 @@ export async function runTheme(packageRoot, argv) {
     console.log(`SODA · 自定义主题\n${section.split('\n## ')[0]}`);
     return;
   }
-  if (!positionals.length && !values.from) { console.log(help); return; }
+  if (!positionals.length && !values.from) { process.stdout.write(themeHelp); return; }
   if (positionals[0] !== 'init' || positionals.length > 2) throw new Error('用 soda theme 查看写法，或用 soda theme init [theme.json] 生成配置。');
   const parent = values.from || 'nju';
   if (!['nju', 'ipads'].includes(parent)) throw new Error('--from 请选择 nju 或 ipads。');
@@ -63,5 +68,5 @@ export async function runTheme(packageRoot, argv) {
     if (error.code === 'EEXIST') throw new Error(`目标已存在，未覆盖：${target}`);
     throw error;
   }
-  console.log(`已创建 ${target}（继承 ${parent}，包括原主题标识）。\n修改 primary / accent 后，用 --theme 指定这个文件；路径相对 Markdown 所在目录。\n将它放在 deck.md 旁并命名为 theme.json，即可运行：soda deck.md --theme theme.json\n字段与标识说明：soda theme；完整参考：soda theme --reference`);
+  console.log(`已创建 ${target}（继承 ${parent}，包括原主题标识）。\n修改 primary / accent 后，用 --theme 指定这个文件；路径相对 Markdown 所在目录。\n将它放在 deck.md 旁并命名为 theme.json，即可运行：soda deck.md --theme theme.json\n字段与标识说明：soda help theme；完整参考：soda theme --reference`);
 }

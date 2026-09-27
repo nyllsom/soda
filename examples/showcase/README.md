@@ -18,7 +18,7 @@ soda deck.md --theme ipads -o showcase-ipads.html
 
 编译需要 Python 3.12+。**Typst** 用于公式和 `.typ` 插图，让 `typst` 在 PATH 中可用，或设置 `SODA_TYPST` 为可执行文件路径。esbuild 已包含在 npm 依赖中，无需单独安装；如需覆盖，可设置 `SODA_ESBUILD`。
 
-自定义配色与标识：`soda theme` 查看写法，`soda theme init --from ipads` 生成配置，修改后用 `soda deck.md --theme theme.json` 应用。`soda theme --reference` 提供离线字段说明。
+编译细节见 `soda help compile`。自定义配色与标识：`soda help theme` 查看写法，`soda theme init --from ipads` 生成配置，修改后用 `soda deck.md --theme theme.json` 应用。`soda theme --reference` 提供离线字段说明。
 
 本次验证使用 Node.js 22.22.2、Python 3.12.3、Typst 0.15.1、esbuild 0.28.2。
 

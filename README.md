@@ -6,11 +6,11 @@
 
 通过 npm 从 Git 安装，提供 `soda` 命令和 `soda example` 范例入口。支持学术排版、公式、代码聚焦、图表、媒体与可回放动画；内置 `nju`（默认）和 `ipads` 两套主题。
 
-- **安装与使用**：[从范例开始](examples/README.md)——安装、浏览范例、复制源码、编译和换主题。
+- **安装与使用**：运行 `soda help` 查看总览；安装步骤见 [从范例开始](examples/README.md)。
 - **查具体写法**：[功能速查](examples/reference.md)。
-- **自定义主题**：安装后运行 `soda theme` 查看中文说明，`soda theme init` 生成配置。
+- **编译与主题**：`soda help compile` 查看编译用法，`soda help theme` 查看自定义主题。
 - **修改编译器**：[开发说明](CONTRIBUTING.md)。
 
-当前为 `0.1.1` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
+当前为 `0.1.2` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
 
 采用 [MIT 许可](LICENSE)。

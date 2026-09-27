@@ -7,11 +7,21 @@
 准备 Node.js 20+ 和 Git，然后通过 HTTPS 从公开仓库安装：
 
 ```bash
-npm install -g git+https://github.com/nyllsom/soda.git
-soda --help
+npm install -g --foreground-scripts git+https://github.com/nyllsom/soda.git
+soda help
 ```
 
 公开仓库无需 GitHub 账号或 SSH 密钥。npm 使用 `git+https://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。若只想安装到当前项目，可去掉 `-g`，随后用 `npx soda …` 执行下面的命令。
+
+安装完成会提示帮助入口。`--foreground-scripts` 让 npm 显示安装脚本的提示；npm 默认可能隐藏它（见 [npm 配置说明](https://docs.npmjs.com/cli/v11/using-npm/config/#foreground-scripts)）。提示脚本只输出文字；即使没有看到提示，直接运行 `soda` 或 `soda help` 都能查看总览。
+
+```bash
+soda help                 # 整体用法与最短工作流
+soda help compile         # 编译参数、路径、输出与依赖
+soda help theme           # 生成、修改并应用自定义主题
+```
+
+也可用 `soda --help`、`soda compile --help`、`soda theme --help`。所有帮助都可离线查看，无需 Python。
 
 **编译自己的稿件**还需要 Python 3.12+，不必额外 `pip install`。CLI 自动查找 Python，也可以用 `SODA_PYTHON` 指定可执行文件路径。公式和 `.typ` 插图另需 Typst；场景打包工具 esbuild 已由 npm 安装。
 
@@ -51,6 +61,8 @@ soda deck.md
 
 ## 4. 指定动画、输出和主题
 
+完整编译说明可随时运行 `soda help compile` 查看；`soda compile deck.md` 与 `soda deck.md` 等效。
+
 ```bash
 soda deck.md
 soda deck.md animation.soda
@@ -68,7 +80,7 @@ soda check deck.md animation.soda
 默认主题是 `nju`。不知道主题 JSON 怎么写时，直接在终端查看中文说明，再在稿件目录生成一份：
 
 ```bash
-soda theme
+soda help theme
 soda theme init
 soda deck.md --theme theme.json
 ```

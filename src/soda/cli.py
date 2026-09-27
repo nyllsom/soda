@@ -17,7 +17,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", "-v", action="version", version=f"SODA {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
     for name in ("check", "html"):
-        cmd = sub.add_parser(name, help="检查内容与时间轴" if name == "check" else "导出 HTML")
+        cmd = sub.add_parser(
+            name, aliases=["compile"] if name == "html" else [],
+            help="检查内容与时间轴" if name == "check" else "导出 HTML",
+        )
         cmd.add_argument("source", help="Markdown 路径")
         cmd.add_argument("motion", nargs="?", help="可选 .soda 路径；省略时自动读取同名文件")
         cmd.add_argument("--static", action="store_true", help="忽略同名 .soda 动画")
@@ -25,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
             cmd.add_argument("-o", "--output", help="输出 HTML 路径；默认在源文件旁生成同名 .html")
             cmd.add_argument("--theme", help="nju（默认）、ipads 或相对 Markdown 的主题 JSON 路径")
             cmd.add_argument("--target", choices=("portable", "web"), default="portable")
-    if argv and argv[0] not in {"check", "html", "--help", "-h", "--version", "-v"}:
+    if argv and argv[0] not in {"check", "html", "compile", "--help", "-h", "--version", "-v"}:
         argv.insert(0, "html")
     args = parser.parse_args(argv)
     try:

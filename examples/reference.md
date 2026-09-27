@@ -212,7 +212,7 @@ export_html(deck, "result.html")
 
 ## 自定义主题
 
-安装 npm 包后，运行 `soda theme` 查看入门写法，`soda theme --reference` 在终端离线查看本节；都无需 Python，也不用寻找安装目录。
+安装 npm 包后，运行 `soda help theme`（或 `soda theme --help`）查看入门写法，`soda theme --reference` 在终端离线查看本节；都无需 Python，也不用寻找安装目录。整体使用和编译说明分别是 `soda help`、`soda help compile`。
 
 ### 先生成，再修改
 
