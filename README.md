@@ -1,16 +1,23 @@
 # SODA
 
-用 Markdown 写演示内容，用可选的 `.soda` 文件安排讲解节奏，运行 `soda deck.md` 生成可分享的 HTML。
+SODA 是一个把 Markdown 转成 HTML 演示文稿的工具，生成的文件可以用浏览器打开、直接分享。
 
-像气泡为水增添轻微的动感，SODA 为静态内容加入适度的动态：内容始终是主体，动画帮助讲解逐步展开。
+它在 Markdown 基础上增加了少量语法：**`.md` 写内容、排版和布局，`.soda` 写动画效果。没有 `.soda`，就生成静态演示文稿。**
 
-通过 npm 从 Git 安装，提供 `soda` 命令和 `soda example` 范例入口。支持学术排版、公式、代码聚焦、图表、媒体与可回放动画；内置 `nju`（默认）和 `ipads` 两套主题。
+像汽水里的气泡，SODA 为静态内容添一点动感。
 
-- **安装与使用**：运行 `npm install -g git+https://github.com/nyllsom/soda.git && soda help`，安装后查看帮助；详细用法见 [从范例开始](examples/README.md)。
-- **查具体写法**：[功能速查](examples/reference.md)。
-- **编译与主题**：`soda help compile` 查看编译用法，`soda help theme` 查看自定义主题。
-- **修改编译器**：[开发说明](CONTRIBUTING.md)。
+安装并查看用法：
 
-当前为 `0.1.4` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
+```bash
+npm install -g git+https://github.com/nyllsom/soda.git && soda help
+```
+
+运行 `soda deck.md` 编译稿件，`soda example` 浏览范例。
+
+- **学习使用**：[从范例开始](examples/README.md) · [语法与功能速查](examples/reference.md)
+- **命令行帮助**：`soda help compile` 查看编译用法，`soda help theme` 查看主题配置
+- **参与开发**：[开发说明](CONTRIBUTING.md)
+
+安装需要 Node.js 20+ 和 Git；编译稿件还需 Python 3.12+，公式与 Typst 插图另需 Typst。浏览内置范例无需 Python 或 Typst。
 
 采用 [MIT 许可](LICENSE)。
