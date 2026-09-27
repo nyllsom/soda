@@ -6,6 +6,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { runExample } from './examples.js';
+import { runTheme } from './theme.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
@@ -17,11 +18,14 @@ const help = `SODA ${version} · Markdown 演示编译器
   soda check <deck.md> [motion.soda]
   soda example [quickstart|showcase] [--theme nju|ipads]
   soda example [quickstart|showcase] --copy <目录>
+  soda theme                           查看主题写法（离线中文说明）
+  soda theme init [theme.json] [--from nju|ipads]
 
 编译：
   省略动画文件时自动读取同名 .soda；省略输出时生成同目录同名 .html。
   -o, --output <文件>    输出路径
   --theme <名称或JSON>   nju（默认）、ipads 或项目主题 JSON
+                        自定义主题从 soda theme 开始
   --static              忽略同名动画
   --target portable|web 单文件 HTML（默认）或 HTML + assets/
 
@@ -93,6 +97,7 @@ try {
   if (!args.length || ['--help', '-h', 'help'].includes(args[0])) process.stdout.write(help);
   else if (['--version', '-v'].includes(args[0])) console.log(`SODA ${version}`);
   else if (args[0] === 'example') await runExample(root, args.slice(1));
+  else if (args[0] === 'theme') await runTheme(root, args.slice(1));
   else compile();
 } catch (error) {
   console.error(`soda: ${error.message}`);

@@ -212,7 +212,35 @@ export_html(deck, "result.html")
 
 ## 自定义主题
 
-入门只需 [新建主题 JSON](README.md) 中的四个字段。要增加标识，可将主题写成下面这样，并把 `logo.png` 放在该 JSON 旁边：
+安装 npm 包后，运行 `soda theme` 查看入门写法，`soda theme --reference` 在终端离线查看本节；都无需 Python，也不用寻找安装目录。
+
+### 先生成，再修改
+
+在 Markdown 所在目录运行：
+
+```bash
+soda theme init
+soda deck.md --theme theme.json
+```
+
+第一条生成继承 NJU 的 `theme.json`；修改它的 `primary`（主色）和 `accent`（辅助强调色），再执行第二条看效果。生成器不会覆盖已有文件。也可用 `soda theme init themes/lab.json --from ipads` 从 IPADS 开始。
+
+主题只需写要改变的字段，其他设置继承 `extends` 指定的内置主题。JSON 使用双引号，不支持注释或末尾逗号。颜色填写 CSS 色值，尺寸用 `"160px"` 这样的字符串。
+
+```json
+{
+  "extends": "nju",
+  "name": "实验室",
+  "primary": "#245a73",
+  "accent": "#a65432"
+}
+```
+
+`theme.json` 不会仅因存在就自动启用：用 `--theme theme.json` 指定，或在 Markdown 开头的 `---` 配置区加入 `theme: theme.json`。命令行选择优先于 Markdown 配置。主题 JSON 路径相对 **Markdown 所在目录**。
+
+### 换成自己的标识
+
+将主题写成下面这样，并把 `logo.png` 放在该 JSON 旁边：
 
 ```json
 {
@@ -228,7 +256,31 @@ export_html(deck, "result.html")
 
 `extends` 只能选内置的 `nju` 或 `ipads`，默认是前者。标识路径相对主题 JSON，而非 Markdown。继承主题后，不覆盖标识就继续使用该主题的标识；将 `brand_logo` 或封面附属标识 `affiliation_logo` 设为 `null` 可以移除。
 
-完整字段可对照 [nju.json](../src/soda/themes/nju.json) 与 [ipads.json](../src/soda/themes/ipads.json)。`"$primary"` 表示引用主色，例如代码高亮使用该引用，覆盖主色后就会同步变化。
+`"$primary"` 表示引用主色，例如 `"code_highlight": "$primary"` 会使代码高亮跟随主色。不支持的字段、未知引用或循环引用会在编译时报告错误。
+
+### 字段参考
+
+| 字段 | 控制什么 |
+| :--- | :--- |
+| `extends`、`name` | 继承的内置主题（`nju` / `ipads`）、主题名称 |
+| `primary`、`accent` | 主色、辅助强调色；也是图表前两组数据的颜色 |
+| `background`、`stage`、`surface` | 页面底色、页面外的背景、卡片底色 |
+| `foreground`、`muted`、`border` | 正文色、次要文字色、边框色 |
+| `font_family` | CSS 字体列表；字体需在观看者环境中可用 |
+| `table_divider` | 表格分隔线颜色 |
+| `brand_logo`、`brand_label` | 主标识图片、供辅助技术读取的文字说明 |
+| `logo_width`、`logo_height` | 普通页面主标识的宽、高 |
+| `cover_logo_width`、`cover_logo_height` | 封面主标识的宽、高；未指定时沿用普通页面尺寸 |
+| `affiliation_logo`、`affiliation_label` | 封面附属标识图片、文字说明（IPADS 默认使用 SJTU） |
+| `affiliation_width`、`affiliation_height` | 封面附属标识的宽、高 |
+| `title_rule_width`、`title_rule_height`、`cover_rule_width` | 标题下装饰线的宽、粗细，以及封面装饰线宽度 |
+| `code_background`、`code_canvas`、`code_foreground` | 代码标题栏底色、代码正文底色、代码默认文字色 |
+| `code_keyword`、`code_string`、`code_comment` | 关键字、字符串、注释的颜色 |
+| `code_number`、`code_function`、`code_highlight` | 数值、函数、代码聚焦与高亮的颜色 |
+
+尺寸字段都填写带单位的字符串；两种标识均可设为 `null` 移除。内置主题会继承各自的配色、字体和标识，所以只覆盖主色不会把所有辅助色也改成同一种颜色。布局仍在 Markdown 中设置，无需填写 `id` 或 `layout`。
+
+### 让素材跟随换色
 
 自己制作的素材需要使用主题变量，才能一起换色：
 

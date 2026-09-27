@@ -16,6 +16,7 @@ test('help and version do not require Python', () => {
   assert.equal(help.status, 0);
   assert.match(help.stdout, /soda <deck.md>/);
   assert.match(help.stdout, /soda example/);
+  assert.match(help.stdout, /soda theme/);
   const version = run(['--version'], { env });
   const metadata = JSON.parse(readFileSync(path.join(root, 'package.json')));
   assert.equal(version.stdout.trim(), `SODA ${metadata.version}`);
@@ -58,6 +59,7 @@ test('example copy works without Python and never overwrites a directory', t => 
   const env = { ...process.env, SODA_PYTHON: '/missing/python' };
   const copied = run(['example', '--copy', '我的演示'], { cwd, env });
   assert.equal(copied.status, 0, copied.stderr);
+  assert.match(copied.stdout, /soda theme init/);
   const source = path.join(cwd, '我的演示/deck.md');
   assert.match(readFileSync(source, 'utf8'), /内容先行/);
   writeFileSync(source, 'keep this');

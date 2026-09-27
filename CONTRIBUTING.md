@@ -8,6 +8,7 @@
 | :--- | :--- |
 | npm 命令、Python 查找与启动 | `bin/soda.js` |
 | 范例浏览和源码复制 | `bin/examples.js`、`examples/index.html` |
+| 主题说明与配置生成 | `bin/theme.js`、`examples/reference.md` |
 | Python API、编译参数 | `src/soda/api.py`、`cli.py` |
 | Markdown 内容和布局语法 | `src/soda/compiler/content.py` |
 | 动画语法、对象检查和时间轴 | `src/soda/compiler/` |
@@ -15,7 +16,7 @@
 | 留白、字号、浏览器动画 | `src/soda/html/academic.css`、`runtime.js` |
 | 内置主题与标识 | `src/soda/themes/` |
 
-npm 包携带 Python 源码，启动器调用本机 Python，直接加载随包编译器，不安装 Python 依赖、不使用安装脚本构建范例。esbuild 是 npm 依赖；`soda example` 的预览和复制功能直接由 Node.js 提供。
+npm 包携带 Python 源码，启动器调用本机 Python，直接加载随包编译器，不安装 Python 依赖、不使用安装脚本构建范例。esbuild 是 npm 依赖；`soda example` 的预览和复制、`soda theme` 的说明和配置生成直接由 Node.js 提供。
 
 Markdown 决定内容和布局，`.soda` 引用已有对象安排动作。编译器将动作转换为绝对时间区间，播放器按当前时间求画面，因此可以回退和任意跳转。`src/soda/vendor/` 是随包携带的 Zanim Web 运行时及许可。
 

@@ -88,7 +88,7 @@ export async function runExample(packageRoot, argv) {
         filter: item => !item.split(path.sep).includes('__pycache__') && !/\.py[co]$/.test(item),
       });
     }
-    console.log(`已复制 ${name || 'quickstart'} 到 ${destination}\n进入该目录后运行：soda deck.md`);
+    console.log(`已复制 ${name || 'quickstart'} 到 ${destination}\n进入该目录后运行：soda deck.md\n自定义主题：soda theme 查看写法，soda theme init 生成配置。`);
     return;
   }
   if (values.theme && !name) throw new Error('指定主题时请同时选择示例，例如 soda example showcase --theme ipads。');

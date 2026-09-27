@@ -65,7 +65,17 @@ soda check deck.md animation.soda
 - `--static` 忽略同名动画，不能与显式动画文件一起使用。
 - 命令行给出的 Markdown、动画和输出路径都相对当前工作目录。内容中的资源路径、主题 JSON 路径相对 Markdown 所在目录。
 
-默认主题是 `nju`。自己的主题可以放在 `themes/lab.json`：
+默认主题是 `nju`。不知道主题 JSON 怎么写时，直接在终端查看中文说明，再在稿件目录生成一份：
+
+```bash
+soda theme
+soda theme init
+soda deck.md --theme theme.json
+```
+
+修改生成文件的 `primary` 和 `accent` 即可调整两种强调色；其他字段继承原主题。查看说明和生成配置都不需要 Python，也不必打开仓库。要从 IPADS 开始，用 `soda theme init --from ipads`；已有文件不会被覆盖。
+
+最小配置如下，也可以自行存为 `themes/lab.json`：
 
 ```json
 {
@@ -76,7 +86,7 @@ soda check deck.md animation.soda
 }
 ```
 
-然后运行 `soda deck.md --theme themes/lab.json`。只写要修改的字段即可；标识和素材换色见 [自定义主题](reference.md#自定义主题)。
+然后运行 `soda deck.md --theme themes/lab.json`。JSON 不会自动启用，需通过 `--theme` 指定，或在 Markdown 开头的配置区写入 `theme: themes/lab.json`。原主题标识会被继承；修改标识和更多字段，运行 `soda theme --reference` 离线查看，或阅读 [自定义主题](reference.md#自定义主题)。
 
 ## 5. 分享和继续查阅
 
