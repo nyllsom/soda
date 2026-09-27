@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+node_modules/
+!src/soda/vendor/zanim_web/dist/
+!src/soda/vendor/zanim_web/dist/zanim_web_core.wasm

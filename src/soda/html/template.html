@@ -1,0 +1,28 @@
+<!doctype html>
+<!--
+SODA browser player, derived from Zanim Slide Language and Zanim Web.
+__RUNTIME_LICENSE__
+-->
+<html lang="__HTML_LANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__</title>
+__ZANIM_HEAD__
+<style>
+__STYLE__
+</style>
+</head>
+<body class="theme-__THEME_ID__ layout-__THEME_LAYOUT__" style="__THEME_VARS__">
+<main class="stage">__SLIDES__</main>
+<div class="shared-transition-overlay" aria-hidden="true"></div>
+<div class="layout-diagnostics" aria-live="polite"></div>
+<div class="hud"><span class="counter"></span><span>·</span><span class="step">__READY_LABEL__</span></div>
+<div class="hint">__HINT_LABEL__</div>
+<input class="scrub" type="range" min="0" value="0" step="0.001" aria-label="Presentation timeline">
+<script type="application/json" id="soda-runtime">__RUNTIME__</script>
+<script>
+__PLAYER_JS__
+</script>
+</body>
+</html>

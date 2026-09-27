@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" role="img" aria-label="示意坐标轴">
+  <path d="M32 16V174H452" fill="none" stroke="var(--soda-border)" stroke-width="2"/>
+  <path d="M32 60H452M32 116H452" fill="none" stroke="var(--soda-table-divider)" stroke-width="1"/>
+</svg>

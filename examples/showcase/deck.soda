@@ -1,0 +1,123 @@
+const QUICK: Duration = 360ms;
+
+motion cover {
+    step "开始" {
+        parallel(duration = 500ms) {
+            subtitle.fade_in(at = 100ms);
+        }
+    }
+}
+
+motion markdown {
+    step "表格也有对象身份" {
+        capabilities_r3.fade_in(duration = QUICK);
+    }
+}
+
+motion layouts {
+    step "叠加曲线" {
+        overlay_curve.create(duration = 600ms);
+    }
+}
+
+motion math_code {
+    step "居中 · 主题色" {
+        parallel(duration = 600ms) {
+            equation.create(easing = LINEAR);
+            policy.focus(range = [2, 4], duration = QUICK);
+        }
+    }
+    step "居左 · 正文色" {
+        loss.create(duration = 500ms);
+    }
+    step "短暂强调" {
+        parallel(duration = 500ms) {
+            equation.highlight();
+            policy.highlight(line = 5);
+        }
+    }
+}
+
+motion academic {
+    step "图表系列" {
+        curve_ours.fade_in(duration = 500ms);
+    }
+    step "技术图节点与边" {
+        parallel(duration = 420ms) {
+            encoder.fade_in();
+            pipeline_edge_2.fade_in(at = 100ms);
+        }
+    }
+}
+
+motion media {
+    step "图片也可以出现" {
+        picture.create(duration = 500ms);
+    }
+}
+
+motion scene {
+    step "连续改变参数" {
+        parallel(duration = 1800ms) {
+            koch.animate(name = "iteration", from = 0, to = 3, easing = LINEAR);
+            scene_code.focus(range = [1, 5], duration = QUICK);
+        }
+    }
+    step "直接设置状态" {
+        koch.set(name = "iteration", value = 1);
+        scene_code.focus(line = 6, duration = QUICK);
+    }
+}
+
+motion object_motion {
+    step "出现与移动" {
+        parallel(duration = QUICK) {
+            marker.fade_in();
+            motion_code.focus(line = 1);
+        }
+        marker.move(by = vec2(48, 0), duration = 400ms);
+        motion_code.focus(line = 2, duration = QUICK);
+    }
+    step "缩放与旋转" {
+        marker.scale(by = 1.08, duration = 400ms);
+        marker.rotate(by = 0.08, duration = 400ms);
+        motion_code.focus(range = [3, 4], duration = QUICK);
+    }
+    step "透明度与离场" {
+        marker.opacity(to = 0.45, duration = QUICK);
+        wait 200ms;
+        parallel(duration = QUICK) {
+            marker.fade_out();
+            motion_code.focus(range = [5, 6]);
+            motion_note.fade_in(at = 100ms);
+        }
+    }
+}
+
+motion fit {
+    step "展开卡片" {
+        card.fit_to(target = slot, duration = 800ms);
+    }
+}
+
+motion shared_source {
+    step "公式进入" {
+        hero_mark.create(duration = 500ms);
+    }
+}
+
+flow {
+    cover -> markdown using fade(duration = QUICK);
+    markdown -> columns using cut();
+    columns -> layouts using push(LEFT, duration = 440ms);
+    layouts -> math_code using fade(duration = QUICK);
+    math_code -> academic using fade(duration = QUICK);
+    academic -> media using fade(duration = QUICK);
+    media -> documents using cut();
+    documents -> scene using fade(duration = QUICK);
+    scene -> object_motion using fade(duration = QUICK);
+    object_motion -> fit using fade(duration = QUICK);
+    fit -> shared_source using fade(duration = QUICK);
+    shared_source -> overview using shared("hero", "hero_mark", duration = 800ms);
+    overview -> tools using embed_zoom(duration = 800ms);
+}

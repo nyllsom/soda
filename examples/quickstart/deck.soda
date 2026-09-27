@@ -1,0 +1,21 @@
+// Markdown 决定初始布局；这里只描述讲解时发生的变化。
+motion steps {
+    step "观察" {
+        parallel(duration = 400ms) {
+            observation.fade_in();
+            source.focus(range = [2, 4]);
+        }
+    }
+    step "解释" {
+        parallel(duration = 400ms) {
+            explanation.fade_in();
+            source.focus(range = [5, 7]);
+        }
+    }
+}
+
+flow {
+    intro -> layout using cut();
+    layout -> steps using fade(duration = 300ms);
+    steps -> export using fade(duration = 300ms);
+}

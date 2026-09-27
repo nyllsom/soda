@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" role="img" aria-label="逐渐上升的示意曲线">
+  <path d="M40 160C112 156 128 118 192 112S280 48 342 46S409 32 438 24" fill="none" stroke="var(--soda-primary)" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="438" cy="24" r="7" fill="var(--soda-primary)"/>
+</svg>
