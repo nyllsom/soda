@@ -180,9 +180,9 @@ flow { a -> b using fade(duration = 500ms); }
     assert "e.preventDefault(); navigate(-1);" in html
 
 
-def test_academic_theme_has_consistent_academic_spacing_and_intrinsic_tables():
+def test_nju_theme_has_consistent_academic_spacing_and_intrinsic_tables():
     content = SourceUnit("deck.md", """---
-theme: academic
+theme: nju
 ---
 # Cover {#cover}
 Subtitle.

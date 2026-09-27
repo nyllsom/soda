@@ -1,0 +1,24 @@
+{
+  "name": "@nyllsom/soda",
+  "version": "0.1.0",
+  "description": "用 Markdown 与声明式动画制作可分享的 HTML 演示",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "soda": "bin/soda.js" },
+  "engines": { "node": ">=20" },
+  "repository": { "type": "git", "url": "git+ssh://git@github.com/nyllsom/soda.git" },
+  "homepage": "https://github.com/nyllsom/soda#readme",
+  "files": [
+    "bin/",
+    "src/soda/**/*.{py,css,js,json,html,png,wasm}",
+    "src/soda/vendor/zanim_web/LICENSE",
+    "examples/**/*.{md,soda,py,js,html,svg,png,mp4,pdf,typ,csv,bib}",
+    "pyproject.toml",
+    "CONTRIBUTING.md"
+  ],
+  "scripts": {
+    "test": "node --test tests/node/*.test.js",
+    "examples:build": "node bin/soda.js examples/quickstart/deck.md -o examples/preview/quickstart-nju.html && node bin/soda.js examples/quickstart/deck.md --theme ipads -o examples/preview/quickstart-ipads.html && node bin/soda.js examples/showcase/deck.md -o examples/preview/showcase-nju.html && node bin/soda.js examples/showcase/deck.md --theme ipads -o examples/preview/showcase-ipads.html"
+  },
+  "dependencies": { "esbuild": "0.28.2" }
+}

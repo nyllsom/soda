@@ -1,15 +1,15 @@
 # SODA
 
-用 Markdown 写演示内容，用可选的 `.soda` 文件安排讲解节奏，再通过 Python 导出 HTML。
+用 Markdown 写演示内容，用可选的 `.soda` 文件安排讲解节奏，运行 `soda deck.md` 生成可分享的 HTML。
 
 像气泡为水增添轻微的动感，SODA 为静态内容加入适度的动态：内容始终是主体，动画帮助讲解逐步展开。
 
-第一版保留编译器、浏览器播放器和主题系统。支持学术排版、代码聚焦、公式、图表、媒体与可回放动画；默认导出可单独分享的 HTML。
+通过 npm 从 Git 安装，提供 `soda` 命令和 `soda example` 范例入口。支持学术排版、公式、代码聚焦、图表、媒体与可回放动画；内置 `nju`（默认）和 `ipads` 两套主题。
 
-- **从这里开始**：[安装与示例](examples/README.md)。先运行四页入门，再看十四页完整展示。
-- **需要查阅时**：[Python API](docs/api.md) · [语法](docs/language.md) · [添加主题](docs/themes.md)。
-- **参与开发**：[结构与验证](docs/development.md)。
+- **安装与使用**：[从范例开始](examples/README.md)——安装、浏览范例、复制源码、编译和换主题。
+- **查具体写法**：[功能速查](examples/reference.md)。
+- **修改编译器**：[开发说明](CONTRIBUTING.md)。
 
-当前为 `0.1.0` 原型，要求 Python 3.12+。普通内容导出无第三方 Python 运行依赖；公式需要 Typst，单文件 Zanim 场景需要 esbuild。当前产物是 HTML，不是 PPTX；不包含编辑器扩展，也尚未发布到包索引。
+当前为 `0.1.0` 原型。npm 入口需要 Node.js 20+；编译自己的稿件还需要 Python 3.12+，公式和 Typst 插图需要 Typst。范例已随包预生成，浏览无需 Python 或 Typst。Python API 继续保留。
 
-代码沿用 MIT 许可，来源与素材说明见 [NOTICE](NOTICE.md)。
+采用 [MIT 许可](LICENSE)。

@@ -1,4 +1,4 @@
-"""同一份内容导出两套主题；需要 Typst 和 esbuild。"""
+"""同一份内容导出 NJU 与 IPADS 两套主题；需要 Typst 和 esbuild。"""
 
 from pathlib import Path
 

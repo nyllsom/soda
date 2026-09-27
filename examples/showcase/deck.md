@@ -1,7 +1,7 @@
 ---
 deck: SODA · 十四页功能速览
 author: SODA
-theme: academic
+theme: nju
 lang: zh
 bibliography: assets/references.bib
 ---
@@ -284,11 +284,11 @@ $$ {#hero_mark font_size=46 color=primary}
 
 ### 最短工作流
 
-```python {#commands line_numbers=false}
-from soda import compile_deck, export_html
-
-deck = compile_deck("deck.md")
-export_html(deck, "demo.html")
+```bash {#commands line_numbers=false}
+soda deck.md
+soda deck.md -o demo.html
+soda deck.md --theme ipads -o ipads.html
+soda example
 ```
 
 编译时检查对象、资源与时间冲突；浏览器中检查排版。分享只需发送导出的 HTML。

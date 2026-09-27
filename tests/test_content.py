@@ -7,7 +7,7 @@ from soda.compiler.diagnostics import ParseError
 def test_markdown_heading_layout_becomes_object_tree():
     doc = parse_content('''---
 deck: Demo
-theme: academic
+theme: nju
 ---
 # Intro {#intro}
 Lead paragraph. {#lead}

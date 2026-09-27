@@ -25,8 +25,8 @@ class BrandReader(HTMLParser):
 
 
 @pytest.mark.parametrize("name,layout,labels", [
-    ("academic", "academic", []),
-        ("ipads", "academic", [
+    ("nju", "academic", ["Nanjing University"]),
+    ("ipads", "academic", [
         "IPADS — Institute of Parallel and Distributed Systems", "Shanghai Jiao Tong University",
     ]),
 ])
@@ -38,18 +38,22 @@ def test_declarative_themes_render_their_own_brand_and_shared_layout(name, layou
     assert reader.labels == labels
 
 
-def test_ipads_logo_payloads_are_original_embedded_assets():
+@pytest.mark.parametrize("theme_name,field,filename", [
+    ("nju", "brand_logo", "nju-logo.png"),
+    ("ipads", "brand_logo", "ipads-logo.png"),
+    ("ipads", "affiliation_logo", "sjtu-logo.png"),
+])
+def test_logo_payloads_are_original_embedded_assets(theme_name, field, filename):
     assets = Path(__file__).resolve().parents[1] / "src/soda/themes/assets"
-    theme = resolve_theme(" IPADS ")
-    for payload, filename in [(theme.brand_logo, "ipads-logo.png"),
-                              (theme.affiliation_logo, "sjtu-logo.png")]:
-        assert payload.startswith("data:image/png;base64,")
-        assert base64.b64decode(payload.split(",", 1)[1]) == (assets / filename).read_bytes()
+    theme = resolve_theme(f" {theme_name.upper()} ")
+    payload = getattr(theme, field)
+    assert payload.startswith("data:image/png;base64,")
+    assert base64.b64decode(payload.split(",", 1)[1]) == (assets / filename).read_bytes()
 
 
 def test_export_theme_override_keeps_source_and_timeline(tmp_path):
     source = tmp_path / "deck.md"
-    original = "---\ntheme: academic\n---\n# Research {#cover}\nResult. {#result}\n"
+    original = "---\ntheme: nju\n---\n# Research {#cover}\nResult. {#result}\n"
     source.write_text(original)
     source.with_suffix(".soda").write_text("motion cover { result.fade_in(duration = 300ms); }")
     target = tmp_path / "demo.html"
@@ -62,6 +66,19 @@ def test_export_theme_override_keeps_source_and_timeline(tmp_path):
     assert source.read_text() == original
 
 
-def test_unknown_theme_reports_available_definitions():
-    with pytest.raises(ValueError, match="available themes: academic, ipads"):
-        resolve_theme("missing")
+@pytest.mark.parametrize("name", ["missing", "academic"])
+def test_unknown_or_removed_theme_reports_only_nju_and_ipads(name):
+    with pytest.raises(ValueError, match="available themes: ipads, nju"):
+        resolve_theme(name)
+
+
+def test_default_and_implicit_custom_parent_are_nju(tmp_path):
+    theme = resolve_theme()
+    assert theme.id == "nju"
+    assert theme.brand_label == "Nanjing University"
+    custom = tmp_path / "custom.json"
+    custom.write_text('{"name": "Custom", "primary": "#123456"}')
+    inherited = resolve_theme(custom)
+    assert inherited.brand_logo == theme.brand_logo
+    assert inherited.primary == inherited.code_keyword == inherited.code_function == "#123456"
+    assert theme.primary != theme.accent

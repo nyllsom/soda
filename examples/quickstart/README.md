@@ -1,28 +1,28 @@
 # 四页入门
 
-这个示例只需要 Python，不含公式、外部素材或 JavaScript 场景。
-
-在仓库根目录完成安装后运行：
+先按 [使用说明](https://github.com/nyllsom/soda/blob/main/examples/README.md) 安装，再打开预生成的示例：
 
 ```bash
-python examples/quickstart/build.py
+soda example quickstart
 ```
 
-打开 `dist/quickstart.html`，同时阅读以下三个文件：
-
-- `deck.md`：标题划分页和区域；`left|right 1:1` 将两个区域并排。
-- `deck.soda`：用对象 ID 指定动画，用 `step` 指定讲解停顿；代码聚焦和右侧内容同步出现。
-- `build.py`：调用公开 Python API。资源路径随 Markdown 所在目录解析，不依赖启动位置。
-
-四页分别介绍分工、源码与布局、源码与动画、导出与分享。前两页静态呈现，第三页用两次点击展开两条结论；动画用于引导注意力。
-
-也可以直接调用命令行：
+复制源码并生成自己的第一份演示：
 
 ```bash
-soda check examples/quickstart/deck.md
-soda html examples/quickstart/deck.md -o dist/quickstart.html
-soda html examples/quickstart/deck.md --static -o dist/quickstart-static.html
-soda html examples/quickstart/deck.md --theme ipads -o dist/quickstart-ipads.html
+soda example quickstart --copy my-talk
+cd my-talk
+soda deck.md
 ```
 
-先改正文，再尝试调整第三页的 `duration`。如需更多对象或转场，查看 [完整展示](../showcase/README.md)。
+打开 `deck.html`，对照 [deck.md](deck.md) 与 [deck.soda](deck.soda) 阅读。在仓库中也可运行 `soda examples/quickstart/deck.md -o dist/quickstart.html`。
+
+| 页面 | 看什么 | 可以试着改什么 |
+| :--- | :--- | :--- |
+| 1 · 封面 | `#` 建立封面，后面是副标题 | 换成自己的演示标题 |
+| 2 · 排版 | `left\|right 1:1` 让两个 `###` 区域并排 | 将比例改为 `2:1`，观察宽度 |
+| 3 · 动画 | 两次点击展开两条结论，左侧代码同步聚焦 | 在 `.soda` 中将 `400ms` 改为 `800ms` |
+| 4 · 导出 | `soda deck.md` 生成 HTML，`-o` 指定输出 | 加上 `--static` 导出静态版本 |
+
+第三页中，Markdown 的 `{#observation .card}` 给“观察”卡片取名，动画中的 `observation.fade_in()` 让整张卡片出现。前两页保持静态，第三页才用动画引导讲解。
+
+这个例子的编译只需 Python 3.12+，无需 Typst。默认 NJU，换主题用 `soda deck.md --theme ipads`。如需 Python API，[build.py](build.py) 展示对应调用；公式、媒体和更多转场见 [完整展示](https://github.com/nyllsom/soda/blob/main/examples/showcase/README.md)。

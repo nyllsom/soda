@@ -1,6 +1,6 @@
 ---
 deck: SODA · 四页入门
-theme: academic
+theme: nju
 lang: zh
 ---
 
@@ -63,20 +63,19 @@ motion steps {
 
 ## 03 · 编译一次，直接分享 {#export left|right 1.15:1}
 
-### 在 Python 中使用
+### 在终端中导出
 
-```python {line_numbers=false}
-from soda import compile_deck, export_html
-
-deck = compile_deck("deck.md")
-export_html(deck, "demo.html")
+```bash {line_numbers=false}
+soda deck.md
+soda deck.md motion.soda -o demo.html
+soda deck.md --theme ipads -o demo.html
 ```
 
 同名 `deck.soda` 自动加载；没有动画文件时，仍然是一份完整的静态演示。
 
 ### 交给读者的是一个文件
 
-将 `demo.html` 发给对方，用浏览器打开即可。
+默认生成同目录的 `deck.html`；也可用 `-o` 指定路径。将 HTML 发给对方，用浏览器打开即可。
 
 - **空格 / →**：下一步；**←**：回退
 - **D**：检查内容是否越界

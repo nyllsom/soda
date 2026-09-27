@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SODA · 范例</title>
+  <style>
+    :root{color-scheme:light;font-family:"Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;color:#24252b;background:#faf9fb}
+    *{box-sizing:border-box}body{margin:0}main{max-width:1080px;margin:auto;padding:80px 40px}
+    .eyebrow{font-size:13px;letter-spacing:.14em;color:#6f145f;font-weight:700}h1{font-size:44px;line-height:1.25;margin:16px 0 20px;font-weight:650}
+    .lead{font-size:18px;line-height:1.8;color:#62616b;max-width:740px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:44px 0}
+    article{background:white;border:1px solid #e7e2e8;border-radius:12px;padding:32px}h2{margin:8px 0 16px;font-size:26px;font-weight:650}
+    .number{font-size:13px;color:#797480}p{line-height:1.8}article p{color:#62616b;min-height:58px}
+    .themes{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0}a{color:#6f145f;text-underline-offset:4px}a:focus-visible{outline:3px solid #b092bc;outline-offset:4px}
+    .button{display:inline-block;padding:10px 18px;border:1px solid currentColor;border-radius:6px;text-decoration:none;font-size:15px;font-weight:600}.ipads{color:#2d4198}
+    .source{display:flex;gap:18px;font-size:14px}.source a{color:#77717d}code{font-family:ui-monospace,"DejaVu Sans Mono",monospace;font-size:14px;background:#f0edf2;padding:3px 6px;border-radius:4px}
+    .copy{margin-top:26px;border-top:1px solid #eee9ef;padding-top:20px}.copy code{display:block;background:none;padding:0;overflow-wrap:anywhere;font-size:13px}
+    aside{border-left:3px solid #6f145f;padding-left:22px;color:#62616b;line-height:1.8}aside p{margin:8px 0}footer{margin-top:38px;font-size:13px;color:#817b85}
+    @media(max-width:700px){main{padding:40px 24px}.grid{grid-template-columns:1fr}h1{font-size:34px}article{padding:24px}.copy code{font-size:12px}}
+  </style>
+</head>
+<body><main>
+  <div class="eyebrow">SODA / EXAMPLES</div>
+  <h1>先看效果，再动手修改。</h1>
+  <p class="lead">从四页入门理解内容与动画的分工，再看十四页展示的完整能力。两套主题共用同一份内容，每个例子都附有可编辑源码。</p>
+  <div class="grid">
+    <article>
+      <div class="number">01 / 四页入门</div><h2>从第一份演示开始</h2>
+      <p>页面、两栏布局、逐步讲解和导出。复制这个例子，替换正文，就能开始自己的演示。</p>
+      <div class="themes"><a class="button" href="preview/quickstart-nju.html">NJU 主题 →</a><a class="button ipads" href="preview/quickstart-ipads.html">IPADS 主题 →</a></div>
+      <div class="source"><a href="quickstart/deck.md">Markdown 内容</a><a href="quickstart/deck.soda">SODA 动画</a></div>
+      <div class="copy"><code>soda example quickstart --copy my-talk</code></div>
+    </article>
+    <article>
+      <div class="number">02 / 十四页完整展示</div><h2>按效果找到对应写法</h2>
+      <p>公式与代码、数据图表、媒体、动态场景，以及跨页共享对象和页面预览。</p>
+      <div class="themes"><a class="button" href="preview/showcase-nju.html">NJU 主题 →</a><a class="button ipads" href="preview/showcase-ipads.html">IPADS 主题 →</a></div>
+      <div class="source"><a href="showcase/deck.md">Markdown 内容</a><a href="showcase/deck.soda">SODA 动画</a></div>
+      <div class="copy"><code>soda example showcase --copy my-showcase</code></div>
+    </article>
+  </div>
+  <aside><p><strong>观看：</strong>空格或 → 前进，← 回退，拖动底部进度条回看；D 检查布局。</p>
+    <p><strong>修改：</strong>复制源码后进入目标目录，执行 <code>soda deck.md</code> 生成 <code>deck.html</code>。编译需要 Python 3.12+；完整展示还需要 Typst。</p></aside>
+  <footer>这里的范例已经预生成，浏览无需 Python 或 Typst。网页与远程媒体仍需联网。</footer>
+</main></body></html>

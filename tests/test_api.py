@@ -65,7 +65,7 @@ def test_assets_and_project_theme_survive_change_of_working_directory(tmp_path, 
     logo = b'<svg xmlns="http://www.w3.org/2000/svg"><rect width="5" height="5"/></svg>'
     (themes / "logo.svg").write_bytes(logo)
     (themes / "lab.json").write_text(json.dumps({
-        "extends": "academic", "name": "实验室", "primary": "#123456",
+        "extends": "nju", "name": "实验室", "primary": "#123456",
         "brand_logo": "logo.svg", "brand_label": "实验室", "logo_width": "80px",
     }))
     chart = '<svg xmlns="http://www.w3.org/2000/svg"><path stroke="var(--soda-primary)"/></svg>'
@@ -88,8 +88,8 @@ def test_export_override_is_reusable_and_does_not_mutate_compiled_deck(tmp_path)
     ipads = export_html(deck, tmp_path / "ipads.html", theme="ipads").read_text()
     default = export_html(deck, tmp_path / "default.html").read_text()
     assert 'class="theme-ipads layout-academic"' in ipads
-    assert 'class="theme-academic layout-academic"' in default
-    assert deck.theme.id == "academic"
+    assert 'class="theme-nju layout-academic"' in default
+    assert deck.theme.id == "nju"
     assert deck.timeline == initial
 
 

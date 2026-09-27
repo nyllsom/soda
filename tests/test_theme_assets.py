@@ -35,7 +35,7 @@ def image_bytes(src, output):
     return (output.parent / src).read_bytes()
 
 
-@pytest.mark.parametrize("theme_name", ["ipads", "academic"])
+@pytest.mark.parametrize("theme_name", ["ipads", "nju"])
 @pytest.mark.parametrize("portable", [False, True])
 def test_real_demo_assets_follow_one_theme_in_both_export_targets(tmp_path, theme_name, portable):
     for filename in ("curve.svg", "axes.svg", "pipeline.typ"):
@@ -79,10 +79,11 @@ theme: {theme_name}
     assert all(p.read_bytes() == content for p, content in originals.items())
 
 
-def test_new_brand_only_needs_a_json_definition(tmp_path):
+@pytest.mark.parametrize("parent", ["nju", "ipads"])
+def test_new_brand_only_needs_a_json_definition(tmp_path, parent):
     theme_root = tmp_path / "themes"
     theme_root.mkdir()
-    definition = {"extends": "ipads", "name": "Custom", "primary": "#123456"}
+    definition = {"extends": parent, "name": "Custom", "primary": "#123456"}
     (theme_root / "custom.json").write_text(json.dumps(definition))
     shutil.copyfile(DEMO_ASSETS / "curve.svg", tmp_path / "curve.svg")
     md = tmp_path / "deck.md"
@@ -96,6 +97,7 @@ def test_new_brand_only_needs_a_json_definition(tmp_path):
     assert "--soda-primary:#123456" in html
     assert "--soda-code-keyword:#123456" in html
     assert "--soda-code-highlight:#123456" in html
+    assert "--soda-code-function:#123456" in html
 
 
 @pytest.mark.parametrize("value,message", [

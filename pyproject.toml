@@ -5,11 +5,8 @@ description = "A Markdown presentation compiler with optional declarative motion
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
-license-files = ["LICENSE", "NOTICE.md", "src/soda/vendor/zanim_web/LICENSE"]
+license-files = ["LICENSE", "src/soda/vendor/zanim_web/LICENSE"]
 dependencies = []
-
-[project.scripts]
-soda = "soda.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.16", "build>=1"]

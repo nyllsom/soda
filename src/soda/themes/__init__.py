@@ -52,7 +52,7 @@ _ASSET_ROOT = _THEME_ROOT / "assets"
 
 def resolve_theme(name: str | Path | None = None, *, base_dir: Path | None = None) -> Theme:
     """Load a built-in theme or a project JSON; custom files extend one built-in."""
-    label = str(name or "academic").strip()
+    label = str(name or "nju").strip()
     definitions = {p.stem: p for p in _THEME_ROOT.glob("*.json")}
     custom = {}
     asset_root = _ASSET_ROOT
@@ -66,7 +66,7 @@ def resolve_theme(name: str | Path | None = None, *, base_dir: Path | None = Non
         custom = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(custom, dict):
             raise ValueError(f"theme {path} must contain a JSON object")
-        parent = custom.pop("extends", "academic")
+        parent = custom.pop("extends", "nju")
         if parent not in definitions:
             raise ValueError(f"theme {path} extends unknown built-in {parent!r}")
         definition = definitions[parent]

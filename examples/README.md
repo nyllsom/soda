@@ -1,23 +1,87 @@
-# 从示例开始
+# 从范例开始
 
-在仓库根目录运行，要求 Python 3.12+：
+先安装并运行 `soda example` 看效果，再复制一个例子修改。内容写在 `.md`，动画写在可选的 `.soda`，输出是可以单独分享的 HTML。
+
+## 1. 安装
+
+准备 Node.js 20+ 和 Git，然后通过 SSH 从仓库安装：
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e .
-python examples/quickstart/build.py
+npm install -g git+ssh://git@github.com/nyllsom/soda.git
+soda --help
 ```
 
-Windows PowerShell 使用 `.venv\Scripts\Activate.ps1` 激活环境。
+需要能通过 SSH 访问该 GitHub 仓库。npm 使用 `git+ssh://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。若只想安装到当前项目，可去掉 `-g`，随后用 `npx soda …` 执行下面的命令。
 
-打开生成的 `dist/quickstart.html`。按 **空格 / →** 前进一步，**←** 回退，**D** 检查布局，也可以拖动底部进度条。接收方无需安装 Python。
+**编译自己的稿件**还需要 Python 3.12+，不必额外 `pip install`。CLI 自动查找 Python，也可以用 `SODA_PYTHON` 指定可执行文件路径。公式和 `.typ` 插图另需 Typst；场景打包工具 esbuild 已由 npm 安装。
 
-| 示例 | 用途 | 构建条件 |
-| :--- | :--- | :--- |
-| [quickstart](quickstart/README.md) | 四页，学会内容、布局、动画和导出 | 只需 Python |
-| [showcase](showcase/README.md) | 十四页，对照源码查看完整能力 | Python、Typst；单文件场景还需 esbuild |
+## 2. 看范例
 
-建议复制 `quickstart/` 作为自己的第一份演示。内容写在 `deck.md`；动画写在同名 `deck.soda`，可以删除动画文件或使用 `static=True` 导出静态版本。
+```bash
+soda example
+soda example showcase --theme ipads
+```
 
-默认导出会内嵌本地资源，只发送一个 HTML 即可。远程网页、远程媒体仍需联网；字体使用接收方系统字体，PDF 的内嵌显示取决于浏览器。正文与动画 API、主题规则分别见 [API](../docs/api.md)、[语法](../docs/language.md)、[主题](../docs/themes.md)。
+第一条命令启动本地范例目录并打开浏览器；第二条直接进入 IPADS 完整展示。服务只监听本机，按 **Ctrl+C** 关闭。若不想自动打开浏览器，加 `--no-open`；用 `--port 8080` 可指定端口，默认自动选择空闲端口。
+
+| 范例 | 用来学什么 |
+| :--- | :--- |
+| [quickstart](quickstart/README.md) | 四页：内容、两栏布局、逐步讲解、CLI 导出 |
+| [showcase](showcase/README.md) | 十四页：公式、图表、媒体、参数场景和全部动画 |
+
+两者都有 NJU 和 IPADS 预览。浏览预生成的范例不需要 Python 或 Typst。
+
+## 3. 复制并修改
+
+```bash
+soda example quickstart --copy my-talk
+cd my-talk
+soda deck.md
+```
+
+打开生成的 `deck.html`。复制不会覆盖已有目录，避免写掉自己的文件。
+
+| 文件 | 你在这里做什么 |
+| :--- | :--- |
+| `deck.md` | 写正文、选布局、引用资源 |
+| `deck.soda` | 指定哪些对象何时出现、如何强调；不需要动画时可删除 |
+| `build.py` | 可选的 Python API 示例；使用 CLI 时无需运行它 |
+
+先改 `deck.md` 的正文，再运行 `soda deck.md`。`#` 是封面，`##` 开始新的一页，`###` 是页内区域。空格或 → 前进，← 回退，拖动底部进度条回看；D 检查内容是否越界。
+
+## 4. 指定动画、输出和主题
+
+```bash
+soda deck.md
+soda deck.md animation.soda
+soda deck.md animation.soda -o dist/talk.html
+soda deck.md --theme ipads -o dist/talk-ipads.html
+soda deck.md --static -o dist/static.html
+soda check deck.md animation.soda
+```
+
+- 不指定动画文件时，自动读取同名 `.soda`；没有该文件就生成静态演示。
+- 不指定 `-o` 时，在 Markdown 旁生成同名 `.html`。指定输出会自动创建父目录，并覆盖已有输出。
+- `--static` 忽略同名动画，不能与显式动画文件一起使用。
+- 命令行给出的 Markdown、动画和输出路径都相对当前工作目录。内容中的资源路径、主题 JSON 路径相对 Markdown 所在目录。
+
+默认主题是 `nju`。自己的主题可以放在 `themes/lab.json`：
+
+```json
+{
+  "extends": "nju",
+  "name": "实验室",
+  "primary": "#245a73",
+  "accent": "#a65432"
+}
+```
+
+然后运行 `soda deck.md --theme themes/lab.json`。只写要修改的字段即可；标识和素材换色见 [自定义主题](reference.md#自定义主题)。
+
+## 5. 分享和继续查阅
+
+默认只发送生成的 HTML 即可，接收方无需安装 SODA。远程网页和远程媒体仍需联网，字体和 PDF 内嵌显示取决于浏览器环境。
+
+部署到静态网站时可用 `soda deck.md --target web -o dist/index.html`，这会生成 HTML 与相邻的 `assets/` 目录，部署时一起上传。
+
+需要更多写法，查看 [功能速查](reference.md)。想直接在 Python 中调用编译器，查看其中的 [Python API](reference.md#python-api)；修改 SODA 本身则看 [开发说明](../CONTRIBUTING.md)。
