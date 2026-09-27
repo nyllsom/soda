@@ -6,7 +6,7 @@
 
 通过 npm 从 Git 安装，提供 `soda` 命令和 `soda example` 范例入口。支持学术排版、公式、代码聚焦、图表、媒体与可回放动画；内置 `nju`（默认）和 `ipads` 两套主题。
 
-- **安装与使用**：运行 `soda help` 查看总览；安装步骤见 [从范例开始](examples/README.md)。
+- **安装与使用**：运行 `npm install -g git+https://github.com/nyllsom/soda.git && soda help`，安装后查看帮助；详细用法见 [从范例开始](examples/README.md)。
 - **查具体写法**：[功能速查](examples/reference.md)。
 - **编译与主题**：`soda help compile` 查看编译用法，`soda help theme` 查看自定义主题。
 - **修改编译器**：[开发说明](CONTRIBUTING.md)。
