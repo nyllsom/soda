@@ -50,4 +50,4 @@ python -m build
 
 `npm pack` 生成 `.tgz`，Python 构建在 `dist/` 生成 wheel。分发前，在仓库外用临时 npm 安装目录检查 CLI、范例预览、源码复制和实际导出；打包内容必须包含两个主题、标识及 Zanim WASM，不能包含虚拟环境和构建工具二进制。
 
-版本号在 `package.json`、`pyproject.toml`、`src/soda/_version.py` 中保持一致。推送到 GitHub 后，可用 `npm install -g git+ssh://git@github.com/nyllsom/soda.git` 安装；本项目当前通过 Git 分发，不需要向 npm registry 发布。
+版本号在 `package.json`、`pyproject.toml`、`src/soda/_version.py` 中保持一致。推送到 GitHub 后，可用 `npm install -g git+https://github.com/nyllsom/soda.git` 安装；公开仓库无需 SSH 密钥。本项目当前通过 Git 分发，不需要向 npm registry 发布。

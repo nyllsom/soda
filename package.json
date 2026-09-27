@@ -6,7 +6,7 @@
   "type": "module",
   "bin": { "soda": "bin/soda.js" },
   "engines": { "node": ">=20" },
-  "repository": { "type": "git", "url": "git+ssh://git@github.com/nyllsom/soda.git" },
+  "repository": { "type": "git", "url": "git+https://github.com/nyllsom/soda.git" },
   "homepage": "https://github.com/nyllsom/soda#readme",
   "files": [
     "bin/",

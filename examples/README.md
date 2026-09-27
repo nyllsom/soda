@@ -4,14 +4,14 @@
 
 ## 1. 安装
 
-准备 Node.js 20+ 和 Git，然后通过 SSH 从仓库安装：
+准备 Node.js 20+ 和 Git，然后通过 HTTPS 从公开仓库安装：
 
 ```bash
-npm install -g git+ssh://git@github.com/nyllsom/soda.git
+npm install -g git+https://github.com/nyllsom/soda.git
 soda --help
 ```
 
-需要能通过 SSH 访问该 GitHub 仓库。npm 使用 `git+ssh://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。若只想安装到当前项目，可去掉 `-g`，随后用 `npx soda …` 执行下面的命令。
+公开仓库无需 GitHub 账号或 SSH 密钥。npm 使用 `git+https://…` 这种 [Git 地址格式](https://docs.npmjs.com/cli/v11/commands/npm-install/#description)。若只想安装到当前项目，可去掉 `-g`，随后用 `npx soda …` 执行下面的命令。
 
 **编译自己的稿件**还需要 Python 3.12+，不必额外 `pip install`。CLI 自动查找 Python，也可以用 `SODA_PYTHON` 指定可执行文件路径。公式和 `.typ` 插图另需 Typst；场景打包工具 esbuild 已由 npm 安装。
 
