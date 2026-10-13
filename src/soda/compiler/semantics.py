@@ -9,8 +9,8 @@ from soda.compiler.motion_api import (
     CODE_MOTION_METHODS,
     GENERIC_MOTION_METHODS,
     MATH_MOTION_METHODS,
+    REMOTION_MOTION_METHODS,
     TRANSITION_KINDS,
-    ZANIM_MOTION_METHODS,
 )
 from soda.compiler.typesys import (
     ANY,
@@ -22,11 +22,11 @@ from soda.compiler.typesys import (
     FLOAT,
     INT,
     MATH,
+    REMOTION_SCENE,
     STRING,
     TRANSITION,
     UNIT,
     VEC2,
-    ZANIM_SCENE,
     Type,
     array_of,
     assignable,
@@ -388,8 +388,8 @@ class SemanticChecker:
             allowed.update(CODE_MOTION_METHODS)
         if inner == MATH:
             allowed.update(MATH_MOTION_METHODS)
-        if inner == ZANIM_SCENE:
-            allowed.update(ZANIM_MOTION_METHODS)
+        if inner == REMOTION_SCENE:
+            allowed.update(REMOTION_MOTION_METHODS)
         if method not in allowed:
             self._error(member, f"{target_type} has no temporal method {method!r}")
 

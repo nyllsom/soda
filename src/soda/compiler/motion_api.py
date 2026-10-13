@@ -15,23 +15,23 @@ GENERIC_MOTION_METHOD_ORDER = (
 )
 CODE_MOTION_METHOD_ORDER = ("focus", "highlight")
 MATH_MOTION_METHOD_ORDER = ("highlight",)
-ZANIM_MOTION_METHOD_ORDER = ("set", "animate")
+REMOTION_MOTION_METHOD_ORDER = ("set", "animate")
 
 GENERIC_MOTION_METHODS = frozenset(GENERIC_MOTION_METHOD_ORDER)
 CODE_MOTION_METHODS = frozenset(CODE_MOTION_METHOD_ORDER)
 MATH_MOTION_METHODS = frozenset(MATH_MOTION_METHOD_ORDER)
-ZANIM_MOTION_METHODS = frozenset(ZANIM_MOTION_METHOD_ORDER)
+REMOTION_MOTION_METHODS = frozenset(REMOTION_MOTION_METHOD_ORDER)
 
 SUPPORTED_MOTION_METHODS = (
     GENERIC_MOTION_METHODS
     | CODE_MOTION_METHODS
     | MATH_MOTION_METHODS
-    | ZANIM_MOTION_METHODS
+    | REMOTION_MOTION_METHODS
 )
 
 TRANSFORM_OPS = frozenset({"move", "rotate", "scale", "fit_to"})
 OPACITY_OPS = frozenset({"fade_in", "fade_out", "opacity"})
-ZANIM_OPS = frozenset({"set", "animate"})
+REMOTION_OPS = frozenset({"set", "animate"})
 
 TRANSITION_KINDS = frozenset({"cut", "fade", "push", "embed_zoom", "shared"})
 
@@ -41,8 +41,8 @@ def channel_for(op: str) -> str:
         return "transform"
     if op in OPACITY_OPS:
         return "opacity"
-    if op in ZANIM_OPS:
-        return "zanim"
+    if op in REMOTION_OPS:
+        return "remotion"
     return op
 
 

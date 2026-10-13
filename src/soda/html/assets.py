@@ -117,7 +117,7 @@ def collect_asset_references(program) -> tuple[AssetManifestEntry, ...]:
                 references.append(("poster", str(node.props["poster"])))
         elif node.kind == "chart" and node.props.get("src"):
             references.append(("data", str(node.props["src"])))
-        elif node.kind == "zanim" and node.props.get("src"):
+        elif node.kind == "remotion" and node.props.get("src"):
             references.append(("module", str(node.props["src"])))
         elif node.kind == "typst" and node.props.get("src"):
             references.append(("typst", str(node.props["src"])))

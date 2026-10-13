@@ -24,7 +24,7 @@ def test_embed_infers_common_research_asset_types():
 """
     )
     assert objects["figure"].kind == "typst"
-    assert objects["scene"].kind == "zanim"
+    assert objects["scene"].kind == "remotion"
     assert objects["plot"].kind == "image"
     assert objects["video"].kind == "video"
     assert objects["paper"].kind == "pdf"

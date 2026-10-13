@@ -8,5 +8,3 @@ dist/
 build/
 node_modules/
 *.tgz
-!src/soda/vendor/zanim_web/dist/
-!src/soda/vendor/zanim_web/dist/zanim_web_core.wasm

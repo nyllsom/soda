@@ -88,8 +88,8 @@ B.
         )
 
 
-def test_zanim_set_is_instant_and_does_not_accept_duration():
-    markdown = "# Demo {#demo}\n@zanim scene.js {#scene value=0}\n"
+def test_remotion_set_is_instant_and_does_not_accept_duration():
+    markdown = "# Demo {#demo}\n@remotion scene.js {#scene value=0}\n"
     compiled = compile_project(
         [SourceUnit("deck.md", markdown)],
         [SourceUnit("motion.soda", 'motion demo { scene.set(name = "value", value = 2); }')],

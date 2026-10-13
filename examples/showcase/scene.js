@@ -1,4 +1,5 @@
-import { Scene, DynamicPolyline, resamplePolylineByArcLength } from '@zanim/web';
+import React from 'react';
+import {AbsoluteFill, useCurrentFrame} from 'remotion';
 
 // 幻灯片负责时间线，场景模块负责几何图形和画框适配。
 function subdivide(points) {
@@ -18,48 +19,14 @@ function subdivide(points) {
 const levels = [[[-4, -1], [4, -1]]];
 for (let i = 0; i < 3; i++) levels.push(subdivide(levels.at(-1)));
 
-export async function mount(container) {
-  const tokens = getComputedStyle(container);
-  const primary = tokens.getPropertyValue('--soda-primary').trim();
-  const surface = tokens.getPropertyValue('--soda-surface').trim();
-  const frame = document.createElement('div');
-  frame.style.cssText = 'width:100%;height:100%;padding:24px;display:grid;grid-template-rows:minmax(0,1fr)32px;background:var(--soda-surface)';
-  const canvas = document.createElement('canvas');
-  canvas.style.cssText = 'width:100%;height:100%;min-height:0;display:block';
-  const label = document.createElement('div');
-  label.style.cssText = 'text-align:center;font:20px "SODA Academic Sans",sans-serif;color:var(--soda-primary)';
-  frame.append(canvas, label);
-  container.replaceChildren(frame);
-  let iteration = 0;
-  let currentTime = 0;
-  const scene = await Scene.create(canvas, {
-    observeResize: false,
-    renderer: { background: surface, unitSize: 40 },
-  });
-  scene.add(new DynamicPolyline(() => {
-    const lo = Math.floor(iteration);
-    const hi = Math.min(3, lo + 1);
-    const mix = iteration - lo;
-    const target = levels[hi];
-    const from = resamplePolylineByArcLength(levels[lo], target.length - 1);
-    return target.map((p, i) => [
-      from[i][0] + (p[0] - from[i][0]) * mix,
-      from[i][1] + (p[1] - from[i][1]) * mix,
-    ]);
-  }, { stroke: primary, strokeWidth: 0.05 }));
-  function draw() {
-    const rect = canvas.getBoundingClientRect();
-    scene.renderer.baseUnitSize = Math.max(1, Math.min(rect.width / 10, rect.height / 5));
-    label.textContent = `iteration ${iteration.toFixed(2)}`;
-    scene.seek(currentTime);
-  }
-  window.addEventListener('resize', draw);
-  return {
-    render(time, props = {}) {
-      iteration = Math.max(0, Math.min(3, Number(props.iteration) || 0));
-      currentTime = time;
-      draw();
-    },
-    destroy() { window.removeEventListener('resize', draw); scene.destroy(); },
-  };
+export const config = {width: 960, height: 540, fps: 30, durationInFrames: 300};
+export default function Koch({iteration = 0}) {
+  const frame = useCurrentFrame();
+  const level = Math.max(0, Math.min(3, Number(iteration)));
+  const points = levels[Math.floor(level)].map(([x,y]) => `${480+x*95},${330-y*95}`).join(' ');
+  return React.createElement(AbsoluteFill, {style: {background: 'var(--soda-surface)', color: 'var(--soda-primary)'}},
+    React.createElement('svg', {viewBox: '0 0 960 540', width: '100%', height: '100%'},
+      React.createElement('polyline', {points, fill: 'none', stroke: 'currentColor', strokeWidth: 5}),
+      React.createElement('text', {x: 480, y: 65, textAnchor: 'middle', fill: 'currentColor', fontSize: 28},
+        `Koch · iteration ${level.toFixed(2)} · frame ${frame}`)));
 }

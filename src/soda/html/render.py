@@ -598,9 +598,16 @@ def _render_object(
             fit = str(node.props.get("fit", "contain")).lower()
             if fit not in {"contain", "cover", "fill", "scale-down"}:
                 raise ValueError(f"image object {slide_id}.{node.id} has invalid fit={fit!r}")
+            expand = node.props.get("expand", True)
+            if not isinstance(expand, bool):
+                raise ValueError(
+                    f"image object {slide_id}.{node.id} has invalid expand={expand!r}; "
+                    "use expand or expand=false"
+                )
             media_attrs = (
                 f'class="{cls} media-object image-media" data-object="{_e(node.id)}" data-kind="image" '
-                f'data-slide-object="true" data-frame="visual"'
+                f'data-slide-object="true" data-frame="visual" '
+                f'data-expand="{str(expand).lower()}"'
             )
             return (
                 f"<figure {media_attrs}>"
@@ -608,7 +615,7 @@ def _render_object(
                 f"<figcaption>{_render_inline_text(caption_text, theme, bibliography)}</figcaption></figure>"
             )
         return f"<figure {attrs}><div class='image-object'>Image</div><figcaption>{_render_inline_text(caption_text, theme, bibliography)}</figcaption></figure>"
-    if node.kind == "zanim":
+    if node.kind == "remotion":
         authored = str(node.props.get("src", ""))
         src = asset_resolver(authored, source_path)
         label = _e(node.props.get("label", node.id))
@@ -620,12 +627,12 @@ def _render_object(
         initial_json = _e(json.dumps(initial, ensure_ascii=False))
         fit = str(node.props.get("fit", "contain")).lower()
         if fit not in {"contain", "cover", "fill"}:
-            raise ValueError(f"zanim object {slide_id}.{node.id} has invalid fit={fit!r}")
+            raise ValueError(f"remotion object {slide_id}.{node.id} has invalid fit={fit!r}")
         return (
-            f'<figure class="{cls} zanim-object" data-object="{_e(node.id)}" data-kind="zanim" '
-            f'data-slide-object="true" data-frame="visual" data-zanim-src="{_e(src)}" '
-            f'data-zanim-fit="{_e(fit)}" data-zanim-props="{initial_json}" aria-label="{label}">'
-            f'<div class="zanim-viewport"><div class="zanim-loading">Loading Zanim Web scene…</div></div></figure>'
+            f'<figure class="{cls} remotion-object" data-object="{_e(node.id)}" data-kind="remotion" '
+            f'data-slide-object="true" data-frame="visual" data-remotion-src="{_e(src)}" '
+            f'data-remotion-fit="{_e(fit)}" data-remotion-props="{initial_json}" aria-label="{label}">'
+            f'<div class="remotion-viewport"><div class="remotion-loading">Loading Remotion scene…</div></div></figure>'
         )
     if node.kind == "video":
         authored = str(node.props.get("src", ""))
@@ -701,7 +708,7 @@ def render_html(
     program: PresentationProgram,
     *,
     asset_resolver: Callable[[str, str], str] | None = None,
-    zanim_head: str | None = None,
+    remotion_head: str | None = None,
     theme: Theme | None = None,
     timeline: TimelineIR | None = None,
 ) -> str:
@@ -713,9 +720,9 @@ def render_html(
     lang = str(program.metadata.get("lang", "en")).lower()
     labels = {
         "ready": "就绪" if lang.startswith("zh") else "ready",
-        "hint": "空格 / → 下一步 · ← 上一步 · D 布局诊断 · 拖动底部边缘跳转"
+        "hint": "空格 / → 下一步 · ← 上一步 · O 目录 · N 备注 · B 返回 · D 检查"
         if lang.startswith("zh")
-        else "Space / → next · ← previous · D layout diagnostics · drag bottom edge to seek",
+        else "Space / → next · ← previous · O outline · N notes · B return · D diagnostics",
         "html_lang": "zh-CN" if lang.startswith("zh") else "en",
     }
     asset_resolver = themed_asset_resolver(theme, asset_resolver or _identity_asset_resolver)
@@ -725,6 +732,18 @@ def render_html(
         if not program.slides:
             raise ValueError("bibliography requires at least one slide source")
         bibliography = load_bibliography(str(bibliography_path), program.slides[0].source)
+    if remotion_head is None:
+        remotion_head = _single_file_remotion_head(program)
+    if _program_uses_remotion(program):
+        scene_paths = set(_collect_remotion_scene_paths(program))
+        original_resolver = asset_resolver
+        def resolve_scene(authored: str, source: str) -> str:
+            ref = resolve_asset_reference(authored, source)
+            if ref.resolved_path in scene_paths:
+                return f"soda-single-scene:{_single_scene_key(ref.resolved_path)}"
+            return original_resolver(authored, source)
+        asset_resolver = resolve_scene
+
     slides: list[str] = []
     for index, slide in enumerate(program.slides, 1):
         slide_classes, _ = _slide_classes(slide)
@@ -735,19 +754,16 @@ def render_html(
             "</article>"
         )
 
-    runtime = {"timeline": to_jsonable(timeline if timeline is not None else compile_timeline(program))}
+    runtime = {
+        "timeline": to_jsonable(timeline if timeline is not None else compile_timeline(program)),
+        "pages": [{"id": slide.id, "title": slide.title,
+                   "notes": slide.root.props.get("speaker_notes", "")} for slide in program.slides],
+    }
     runtime_json = json.dumps(runtime, ensure_ascii=False).replace("</", "<\\/")
-    if zanim_head is None:
-        zanim_head = (
-            '<script type="importmap">{"imports":{"@zanim/web":"./assets/zanim-web/src/zanim.js",'
-            '"@zanim/web/ir":"./assets/zanim-web/src/ir.js"}}</script>'
-            if _program_uses_zanim(program)
-            else ""
-        )
 
     return (
         TEMPLATE.replace("__TITLE__", _e(title))
-        .replace("__ZANIM_HEAD__", zanim_head)
+        .replace("__REMOTION_HEAD__", remotion_head)
         .replace("__HTML_LANG__", _e(labels["html_lang"]))
         .replace("__THEME_ID__", _e(theme.id))
         .replace("__THEME_LAYOUT__", _e(theme.layout))
@@ -759,45 +775,25 @@ def render_html(
     )
 
 
-def _program_uses_zanim(program: PresentationProgram) -> bool:
+def _program_uses_remotion(program: PresentationProgram) -> bool:
     def visit(node: PresentationObject) -> bool:
-        return node.kind == "zanim" or any(visit(child) for child in node.children)
+        return node.kind == "remotion" or any(visit(child) for child in node.children)
 
     return any(visit(slide.root) for slide in program.slides)
 
 
-def _valid_zanim_web_root(root: Path) -> bool:
-    return (root / "src" / "zanim.js").is_file() and (
-        root / "dist" / "zanim_web_core.wasm"
-    ).is_file()
-
-
-def _zanim_web_root() -> Path:
-    configured = os.environ.get("ZANIM_WEB_ROOT")
-    if configured:
-        root = Path(configured).expanduser().resolve()
-        if not _valid_zanim_web_root(root):
-            raise ValueError(
-                f"ZANIM_WEB_ROOT does not contain a complete @zanim/web runtime: {root}"
-            )
-        return root
-
-    # Release wheels carry a tested snapshot of @zanim/web so HTML export is
-    # independent of the source checkout layout. ZANIM_WEB_ROOT remains an
-    # explicit development override for working on both projects together.
-    vendored = Path(__file__).resolve().parent.parent / "vendor" / "zanim_web"
-    if _valid_zanim_web_root(vendored):
-        return vendored
-
-    raise ValueError("Bundled Zanim Web runtime is missing; reinstall SODA from a complete wheel.")
-
-
-def _export_zanim_web_runtime(output: Path) -> None:
-    root = _zanim_web_root()
-    target = output.parent / "assets" / "zanim-web"
-    shutil.copytree(root / "src", target / "src", dirs_exist_ok=True)
-    (target / "dist").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(root / "dist" / "zanim_web_core.wasm", target / "dist" / "zanim_web_core.wasm")
+def _remotion_node_modules() -> Path:
+    configured = os.environ.get("SODA_NODE_MODULES")
+    candidates = ([Path(configured)] if configured else []) + [
+        parent / "node_modules" for parent in (Path(__file__).resolve().parents[3], Path.cwd(), *Path.cwd().parents)
+    ]
+    for candidate in candidates:
+        if all((candidate / name / "package.json").is_file()
+               for name in ("react", "react-dom", "remotion", "@remotion/player")):
+            return candidate.resolve()
+    raise ValueError("Remotion requires Node dependencies; install SODA with npm, or run "
+                     "`npm install react react-dom remotion @remotion/player esbuild` "
+                     "and set SODA_NODE_MODULES to that node_modules directory.")
 
 
 def _esbuild_names() -> tuple[str, ...]:
@@ -834,19 +830,14 @@ def _esbuild_executable(search_from: Path | None = None) -> Path:
         if local is not None:
             return local
     raise ValueError(
-        "portable Zanim JS scenes require esbuild. Install it in the project "
+        "Remotion scenes require esbuild. Install it in the project "
         "with `npm install --save-dev esbuild`, put `esbuild` on PATH, or set SODA_ESBUILD."
     )
 
 
-def _bundle_zanim_modules(paths: list[Path]) -> bytes:
-    """Bundle all local Zanim scene modules once.
-
-    The output module exports a registry mapping stable keys to each authored
-    scene module. This avoids embedding @zanim/web once per scene in portable
-    HTML exports.
-    """
-    root = _zanim_web_root()
+def _bundle_remotion_modules(paths: list[Path]) -> bytes:
+    """Bundle local components and their shared React/Remotion runtime once."""
+    root = _remotion_node_modules()
     unique = []
     seen: set[Path] = set()
     for path in paths:
@@ -860,9 +851,9 @@ def _bundle_zanim_modules(paths: list[Path]) -> bytes:
     for index, path in enumerate(unique):
         key = _single_scene_key(path)
         imports.append(f"import * as m{index} from {json.dumps(path.as_posix())};")
-        entries.append(f"  {json.dumps(key)}: m{index}")
+        entries.append(f"  {json.dumps(key)}: {{mount: (container, context) => mountScene(m{index}, container, context)}}")
     source = (
-        "\n".join(imports)
+        f"import {{mountScene}} from {json.dumps(str(Path(__file__).with_name('remotion-player.js')))};\n" + "\n".join(imports)
         + "\nexport const scenes = {\n"
         + ",\n".join(entries)
         + "\n};\nexport default scenes;\n"
@@ -880,15 +871,18 @@ def _bundle_zanim_modules(paths: list[Path]) -> bytes:
             "--minify",
             "--log-level=error",
             "--tree-shaking=true",
-            f"--alias:@zanim/web={root / 'src' / 'zanim.js'}",
-            f"--alias:@zanim/web/ir={root / 'src' / 'ir.js'}",
+            "--jsx=automatic",
+            '--define:process.env.NODE_ENV="production"',
+            "--loader:.png=dataurl", "--loader:.svg=dataurl", "--loader:.jpg=dataurl",
+            *[f"--alias:{name}={root / name}" for name in
+              ("react", "react-dom", "remotion", "@remotion/player")],
         ]
         result = subprocess.run(command, check=False, capture_output=True)
     finally:
         tmp_path.unlink(missing_ok=True)
     if result.returncode != 0:
         message = result.stderr.decode("utf-8", errors="replace").strip()
-        raise ValueError(f"failed to bundle Zanim scenes: {message or 'esbuild failed'}")
+        raise ValueError(f"failed to bundle Remotion scenes: {message or 'esbuild failed'}")
     return result.stdout
 
 
@@ -896,17 +890,19 @@ def _single_scene_key(path: Path) -> str:
     return hashlib.sha256(path.resolve().as_posix().encode("utf-8")).hexdigest()[:16]
 
 
-def _collect_zanim_scene_paths(program: PresentationProgram) -> list[Path]:
+def _collect_remotion_scene_paths(program: PresentationProgram) -> list[Path]:
     paths: list[Path] = []
 
     def visit(source_path: str, node: PresentationObject) -> None:
-        if node.kind == "zanim" and node.props.get("src"):
+        if node.kind == "remotion" and node.props.get("src"):
             ref = resolve_asset_reference(str(node.props["src"]), source_path)
             if ref.remote:
-                return
+                raise ValueError("Remotion components must be local relative paths")
             assert ref.resolved_path is not None
-            if ref.resolved_path.suffix.lower() in {".js", ".mjs"}:
+            if ref.resolved_path.suffix.lower() in {".js", ".mjs", ".jsx", ".ts", ".tsx"}:
                 paths.append(ref.resolved_path)
+            else:
+                raise ValueError("Remotion components require .js, .mjs, .jsx, .ts, or .tsx")
         for child in node.children:
             visit(source_path, child)
 
@@ -928,8 +924,6 @@ def _single_file_resolver() -> Callable[[str, str], str]:
             raise ValueError(
                 f"asset {authored!r} referenced from {source_path!r} does not exist at {path}"
             )
-        if path.suffix.lower() in {".js", ".mjs"}:
-            return f"soda-single-scene:{_single_scene_key(path)}"
         key = (str(path), path.suffix.lower())
         cached = cache.get(key)
         if cached is not None:
@@ -943,22 +937,13 @@ def _single_file_resolver() -> Callable[[str, str], str]:
     return resolve
 
 
-def _single_file_zanim_head(program: PresentationProgram) -> str:
-    if not _program_uses_zanim(program):
+def _single_file_remotion_head(program: PresentationProgram) -> str:
+    if not _program_uses_remotion(program):
         return ""
-    wasm = _zanim_web_root() / "dist" / "zanim_web_core.wasm"
-    wasm_encoded = base64.b64encode(wasm.read_bytes()).decode("ascii")
-    scene_paths = _collect_zanim_scene_paths(program)
-    bundle = _bundle_zanim_modules(scene_paths) if scene_paths else b"export default {};\n"
+    scene_paths = _collect_remotion_scene_paths(program)
+    bundle = _bundle_remotion_modules(scene_paths)
     bundle_url = "data:text/javascript;base64," + base64.b64encode(bundle).decode("ascii")
-    return (
-        "<script>"
-        + "globalThis.__ZANIM_WASM_URL__="
-        + json.dumps(f"data:application/wasm;base64,{wasm_encoded}")
-        + ";globalThis.__SODA_ZANIM_SCENE_BUNDLE_URL__="
-        + json.dumps(bundle_url)
-        + ";</script>"
-    )
+    return "<script>globalThis.__SODA_REMOTION_SCENE_BUNDLE_URL__=" + json.dumps(bundle_url) + ";</script>"
 
 
 def export_html(
@@ -972,12 +957,10 @@ def export_html(
             program,
             theme=theme, timeline=timeline,
             asset_resolver=_single_file_resolver(),
-            zanim_head=_single_file_zanim_head(program),
+            remotion_head=_single_file_remotion_head(program),
         )
     else:
         exporter = AssetExporter(output)
-        if _program_uses_zanim(program):
-            _export_zanim_web_runtime(output)
         rendered = render_html(program, asset_resolver=exporter.export, theme=theme, timeline=timeline)
     output.write_text(rendered, encoding="utf-8")
     return output
@@ -992,7 +975,7 @@ def _web_resource(name: str) -> str:
 TEMPLATE = (
     _web_resource("template.html")
     .replace("__RUNTIME_LICENSE__", (
-        Path(__file__).resolve().parent.parent / "vendor" / "zanim_web" / "LICENSE"
+        Path(__file__).with_name("NOTICE")
     ).read_text(encoding="utf-8").rstrip())
     .replace("__STYLE__", _web_resource("style.css") + "\n" + _web_resource("academic.css"))
     .replace("__PLAYER_JS__", _web_resource("runtime.js").rstrip())

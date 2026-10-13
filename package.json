@@ -18,16 +18,20 @@
   "files": [
     "bin/",
     "src/soda/**/*.{py,css,js,json,html,png,wasm}",
-    "src/soda/vendor/zanim_web/LICENSE",
-    "examples/**/*.{md,soda,py,js,html,svg,png,mp4,pdf,typ,csv,bib}",
+    "src/soda/html/NOTICE",
+    "examples/**/*.{md,soda,py,js,jsx,ts,tsx,html,svg,png,mp4,pdf,typ,csv,bib}",
     "pyproject.toml",
     "CONTRIBUTING.md"
   ],
   "scripts": {
     "test": "node --test tests/node/*.test.js",
-    "examples:build": "node bin/soda.js examples/quickstart/deck.md -o examples/preview/quickstart-nju.html && node bin/soda.js examples/quickstart/deck.md --theme ipads -o examples/preview/quickstart-ipads.html && node bin/soda.js examples/showcase/deck.md -o examples/preview/showcase-nju.html && node bin/soda.js examples/showcase/deck.md --theme ipads -o examples/preview/showcase-ipads.html"
+    "examples:build": "node bin/soda.js examples/quickstart/deck.md -o examples/preview/quickstart-nju.html && node bin/soda.js examples/quickstart/deck.md --theme ipads -o examples/preview/quickstart-ipads.html && node bin/soda.js examples/showcase/deck.md -o examples/preview/showcase-nju.html && node bin/soda.js examples/showcase/deck.md --theme ipads -o examples/preview/showcase-ipads.html && node bin/soda.js examples/remotion/deck.md -o examples/preview/remotion-nju.html && node bin/soda.js examples/remotion/deck.md --theme ipads -o examples/preview/remotion-ipads.html"
   },
   "dependencies": {
-    "esbuild": "0.28.2"
+    "@remotion/player": "4.0.534",
+    "esbuild": "0.28.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.534"
   }
 }

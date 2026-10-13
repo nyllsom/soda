@@ -108,3 +108,7 @@ soda deck.md --theme theme.json
 部署到静态网站时可用 `soda deck.md --target web -o dist/index.html`，这会生成 HTML 与相邻的 `assets/` 目录，部署时一起上传。
 
 需要更多写法，查看 [功能速查](reference.md)。想直接在 Python 中调用编译器，查看其中的 [Python API](reference.md#python-api)；修改 SODA 本身则看 [开发说明](../CONTRIBUTING.md)。
+
+## Remotion 图标与图表动画
+
+运行 `soda example remotion` 查看三页教学，或 `soda example remotion --copy my-remotion-talk` 复制源码。详见 [Remotion 教程](remotion/README.md)。

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { exampleHelp, runExample } from './examples.js';
 import { runTheme, themeHelp } from './theme.js';
 import { checkHelp, compileHelp, overviewHelp } from './help.js';
+import { previewHelp, runPreview } from './preview.js';
 import { writeHelp } from './terminal.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -17,10 +18,10 @@ const args = process.argv.slice(2);
 function showHelp(topics = []) {
   const pages = new Map([
     ['compile', compileHelp], ['html', compileHelp], ['theme', themeHelp],
-    ['example', exampleHelp], ['check', checkHelp],
+    ['example', exampleHelp], ['check', checkHelp], ['preview', previewHelp],
   ]);
   if (topics.length > 1 || (topics.length && !pages.has(topics[0]))) {
-    throw new Error('帮助主题请选择 compile、theme、example 或 check；运行 soda help 查看总览。');
+    throw new Error('帮助主题请选择 compile、preview、theme、example 或 check；运行 soda help 查看总览。');
   }
   writeHelp(topics.length ? pages.get(topics[0]) : overviewHelp(version));
 }
@@ -51,8 +52,11 @@ function pythonCommand() {
 function compile() {
   const command = pythonCommand();
   const env = { ...process.env };
+  const require = createRequire(import.meta.url);
+  if (!env.SODA_NODE_MODULES) {
+    env.SODA_NODE_MODULES = path.dirname(path.dirname(require.resolve('remotion/package.json')));
+  }
   if (!env.SODA_ESBUILD) {
-    const require = createRequire(import.meta.url);
     const esbuildPackage = path.dirname(require.resolve('esbuild/package.json'));
     // Point Python at the native binary, including Windows installs where bin/esbuild is JS.
     const platform = `${process.platform}-${process.arch}`;
@@ -87,6 +91,10 @@ try {
   else if (['--version', '-v'].includes(args[0])) console.log(`SODA ${version}`);
   else if (args[0] === 'example') await runExample(root, args.slice(1));
   else if (args[0] === 'theme') await runTheme(root, args.slice(1));
+  else if (args[0] === 'preview') {
+    if (args.length === 1 || wantsHelp(args)) showHelp(['preview']);
+    else await runPreview(root, args.slice(1));
+  }
   else if (wantsHelp(args) || (args.length === 1 && ['compile', 'html', 'check'].includes(args[0]))) {
     showHelp([args[0] === 'check' ? 'check' : 'compile']);
   }

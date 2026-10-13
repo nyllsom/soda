@@ -33,6 +33,7 @@ test('every help entry colors output without changing text, examples or spacing'
     ['help', 'theme'], ['theme'], ['theme', 'init', '--help'], ['theme', '--reference'],
     ['help', 'example'], ['example', '--help'],
     ['help', 'check'], ['check', '--help'],
+    ['help', 'preview'], ['preview', '--help'], ['preview'],
   ];
   for (const args of cases) {
     const plain = run(args);
