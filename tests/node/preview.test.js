@@ -17,8 +17,14 @@ test('motion change locator chooses the nearest preceding motion block', () => {
 });
 
 
-test('markdown notes headings stay on their owning slide', () => {
-  const source = '## One\n::: notes\n## Hidden\n:::\n## Two\nBody';
+test('markdown notes stay on their owning slide', () => {
+  const source = '## One\n::: notes\n**Bold note**\n:::\n## Two\nBody';
   assert.equal(markdownSlideIndex(source, 2), 0);
   assert.equal(markdownSlideIndex(source, 5), 1);
+});
+
+test('notes preview does not treat ::: inside code fences as a closer', () => {
+  const source = '## One\n::: notes\n```md\n:::\n## ignored\n```\n:::\n## Two\nBody';
+  assert.equal(markdownSlideIndex(source, 4), 0);
+  assert.equal(markdownSlideIndex(source, 7), 1);
 });

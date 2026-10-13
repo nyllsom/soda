@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE", "src/soda/html/NOTICE"]
-dependencies = []
+dependencies = [
+    "markdown-it-py>=4,<5",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.16", "build>=1"]

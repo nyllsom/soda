@@ -29,6 +29,7 @@ from soda.html.assets import AssetExporter, resolve_asset_reference
 from soda.html.code import render_code
 from soda.html.math import math_svg_asset
 from soda.html.themed_assets import themed_asset_resolver
+from soda.notes import MARKDOWN, parse_notes
 from soda.themes import Theme, css_variables, resolve_theme, typst_theme_inputs
 
 
@@ -704,6 +705,23 @@ def _identity_asset_resolver(authored: str, source_path: str) -> str:
     return authored
 
 
+def _render_speaker_notes(
+    source: str, source_path: str, asset_resolver: Callable[[str, str], str]
+) -> str:
+    """Render safe CommonMark with tables/strikethrough and resolved images."""
+    tokens = parse_notes(source)
+    for token in tokens:
+        for child in token.children or []:
+            if child.type == "image":
+                src = child.attrGet("src")
+                if src:
+                    child.attrSet("src", asset_resolver(src, source_path))
+            elif child.type == "link_open":
+                child.attrSet("target", "_blank")
+                child.attrSet("rel", "noopener noreferrer")
+    return MARKDOWN.renderer.render(tokens, MARKDOWN.options, {})
+
+
 def render_html(
     program: PresentationProgram,
     *,
@@ -757,7 +775,10 @@ def render_html(
     runtime = {
         "timeline": to_jsonable(timeline if timeline is not None else compile_timeline(program)),
         "pages": [{"id": slide.id, "title": slide.title,
-                   "notes": slide.root.props.get("speaker_notes", "")} for slide in program.slides],
+                   "notes": slide.root.props.get("speaker_notes", ""),
+                   "notes_html": _render_speaker_notes(
+                       str(slide.root.props.get("speaker_notes", "")), slide.source, asset_resolver
+                   )} for slide in program.slides],
     }
     runtime_json = json.dumps(runtime, ensure_ascii=False).replace("</", "<\\/")
 

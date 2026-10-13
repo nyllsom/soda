@@ -56,10 +56,18 @@ export function markdownSlideIndex(source, changedLine) {
   let slide = -1;
   let fence = null;
   let notes = false;
+  let notesFence = null;
   for (let i = 0; i <= Math.min(changedLine, lines.length - 1); i += 1) {
     const line = lines[i];
     if (notes) {
-      if (line.trim() === ":::") notes = false;
+      const marker = line.match(/^ {0,3}(`{3,}|~{3,})/);
+      if (notesFence) {
+        if (marker && marker[1][0] === notesFence[0] && marker[1].length >= notesFence.length && !line.slice(marker[0].length).trim()) notesFence = null;
+      } else if (/^ {0,3}:::[ \t]*$/.test(line)) {
+        notes = false;
+      } else if (marker) {
+        notesFence = marker[1];
+      }
       continue;
     }
     const fenceMatch = line.match(/^\s{0,3}(`{3,}|~{3,})/);

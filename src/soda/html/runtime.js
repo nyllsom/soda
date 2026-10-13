@@ -1041,7 +1041,12 @@
     heading.textContent = page?.title || span.id;
     const text = document.createElement('div');
     text.className = 'soda-notes-text';
-    text.textContent = page?.notes || (zh ? '本页没有备注。' : 'No notes for this slide.');
+    if (page?.notes_html) {
+      // Compiled by the safe Markdown renderer (raw HTML disabled).
+      text.innerHTML = page.notes_html;
+    } else {
+      text.textContent = page?.notes || (zh ? '本页没有备注。' : 'No notes for this slide.');
+    }
     const close = document.createElement('button');
     close.textContent = zh ? '关闭备注 (N)' : 'Close notes (N)';
     close.onclick = () => { notesPanel.hidden = true; };

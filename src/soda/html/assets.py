@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
+from soda.notes import parse_notes
+
 
 @dataclass(frozen=True, slots=True)
 class AssetReference:
@@ -148,6 +150,26 @@ def collect_asset_references(program) -> tuple[AssetManifestEntry, ...]:
 
     for slide in program.slides:
         visit(slide.id, slide.source, slide.root)
+        for token in parse_notes(str(slide.root.props.get("speaker_notes", ""))):
+            for child in token.children or []:
+                if child.type != "image":
+                    continue
+                authored = child.attrGet("src")
+                if not authored:
+                    continue
+                ref = resolve_asset_reference(authored, slide.source)
+                entries.append(
+                    AssetManifestEntry(
+                        slide=slide.id,
+                        object_id="notes",
+                        role="image",
+                        authored=authored,
+                        source_path=slide.source,
+                        remote=ref.remote,
+                        resolved_path=str(ref.resolved_path) if ref.resolved_path else None,
+                        exists=None if ref.remote else bool(ref.resolved_path and ref.resolved_path.is_file()),
+                    )
+                )
     bibliography = program.metadata.get("bibliography")
     if bibliography and program.slides:
         source_path = program.slides[0].source

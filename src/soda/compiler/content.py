@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 
 from soda.compiler.diagnostics import Diagnostic, ParseError
 from soda.compiler.span import Span
+from soda.notes import find_notes_close, invalid_notes_line
 
 _ATTR_RE = re.compile(r"\s*\{([^{}]*)\}\s*$")
 _HEADING_RE = re.compile(r"^(#{1,6})(?:[ \t]+(.*?))?[ \t]*$")
@@ -136,8 +137,7 @@ class _ContentParser:
         result: list[_HeadingInfo] = []
         in_fence = False
         in_math = False
-        in_notes = False
-        notes_start = 0
+        notes_end = -1
         frontmatter_end = -1
         first_nonempty = next((i for i, raw in enumerate(self.lines) if raw.strip()), None)
         if first_nonempty is not None and self.lines[first_nonempty].strip() == "---":
@@ -158,13 +158,12 @@ class _ContentParser:
                 if stripped.startswith("$$"):
                     in_math = False
                 continue
-            if in_notes:
-                if stripped == ":::":
-                    in_notes = False
+            if line <= notes_end:
                 continue
             if stripped == "::: notes":
-                in_notes = True
-                notes_start = line
+                notes_end = find_notes_close(self.lines, line + 1, len(self.lines)) or -1
+                if notes_end < line:
+                    self._error(line, "unterminated ::: notes block")
                 continue
             if stripped.startswith("```"):
                 in_fence = True
@@ -177,8 +176,6 @@ class _ContentParser:
                 result.append(
                     _HeadingInfo(line, len(match.group(1)), (match.group(2) or "").strip())
                 )
-        if in_notes:
-            self._error(notes_start, "unterminated ::: notes block")
         return result
 
     def _parse_frontmatter(self, first_slide_line: int) -> None:
@@ -398,12 +395,17 @@ class _ContentParser:
                 i += 1
                 continue
             if stripped == "::: notes":
-                close = next((j for j in range(i + 1, end) if self.lines[j].strip() == ":::"), None)
+                close = find_notes_close(self.lines, i + 1, end)
                 if close is None:
                     self._error(i, "unterminated ::: notes block")
                 assert self.current_slide is not None
                 props = self.current_slide.root.props
-                text = "".join(self.lines[i + 1:close]).strip()
+                text = "".join(self.lines[i + 1:close])
+                invalid = invalid_notes_line(text)
+                if invalid is not None:
+                    relative_line, message = invalid
+                    self._error(i + relative_line + 1, message)
+                text = text.strip()
                 props["speaker_notes"] = "\n\n".join(filter(None, [props.get("speaker_notes", ""), text]))
                 i = close + 1
                 continue
