@@ -12,10 +12,12 @@ SODA 是一个把 Markdown 转成 HTML 演示文稿的工具，生成的文件�
 npm install -g git+https://github.com/nyllsom/soda.git && soda help
 ```
 
-运行 `soda deck.md` 编译稿件，`soda example` 浏览范例。
+运行 `soda deck.md` 编译稿件，`soda preview deck.md` 热更新预览，`soda example` 浏览范例。
 
 - **学习使用**：[从范例开始](examples/README.md) · [语法与功能速查](examples/reference.md)
-- **命令行帮助**：`soda help compile` 查看编译用法，`soda help theme` 查看主题配置
+- **Remotion 动画**：[图标与图表教学](examples/remotion/README.md)，运行 `soda example remotion`
+- **命令行帮助**：`soda help compile` 查看编译用法，`soda help preview` 查看热更新预览，`soda help theme` 查看主题配置
+- **研究汇报**：用 `::: notes` 保存逐页讲解；播放时 `O` 目录、`N` 备注、`B` 返回问答跳转前位置（备注与投影同屏）。
 - **参与开发**：[开发说明](CONTRIBUTING.md)
 
 安装需要 Node.js 20+ 和 Git；编译稿件还需 Python 3.12+，公式与 Typst 插图另需 Typst。浏览内置范例无需 Python 或 Typst。

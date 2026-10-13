@@ -41,51 +41,59 @@
   let currentTime = 0;
   let playbackToken = 0;
   let animationTargetTime = null;
-  const zanimInstances = new Map();
+  const remotionInstances = new Map();
 
-  function parseZanimInitial(el) {
-    try { return JSON.parse(el.dataset.zanimProps || '{}'); }
+  function parseRemotionInitial(el) {
+    try { return JSON.parse(el.dataset.remotionProps || '{}'); }
     catch { return {}; }
   }
-  async function mountZanimScenes() {
-    for (const el of document.querySelectorAll('[data-kind="zanim"][data-zanim-src]')) {
-      if (zanimInstances.has(el)) continue;
-      const viewport = el.querySelector('.zanim-viewport') || el;
+  async function mountRemotionScenes() {
+    for (const el of document.querySelectorAll('[data-kind="remotion"][data-remotion-src]')) {
+      if (remotionInstances.has(el)) continue;
+      const viewport = el.querySelector('.remotion-viewport') || el;
       try {
         let mod;
-        const source = el.dataset.zanimSrc || '';
+        const source = el.dataset.remotionSrc || '';
         if (source.startsWith('soda-single-scene:')) {
-          const bundleUrl = globalThis.__SODA_ZANIM_SCENE_BUNDLE_URL__;
-          if (!bundleUrl) throw new Error('portable Zanim scene bundle is missing');
+          const bundleUrl = globalThis.__SODA_REMOTION_SCENE_BUNDLE_URL__;
+          if (!bundleUrl) throw new Error('portable Remotion scene bundle is missing');
           const registry = await import(bundleUrl);
           const key = source.slice('soda-single-scene:'.length);
           mod = (registry.default || registry.scenes || {})[key];
-          if (!mod) throw new Error(`portable Zanim scene ${key} is missing`);
+          if (!mod) throw new Error(`portable Remotion scene ${key} is missing`);
         } else {
           const moduleUrl = new URL(source, window.location.href).href;
           mod = await import(moduleUrl);
         }
-        const factory = mod.default?.mount || mod.mount || mod.default;
-        if (typeof factory !== 'function') throw new Error('module must export default function or mount()');
+        const factory = mod.mount;
         let authoredProps = {};
-        try { authoredProps = JSON.parse(el.dataset.zanimProps || '{}'); } catch (_) {}
+        try { authoredProps = JSON.parse(el.dataset.remotionProps || '{}'); } catch (_) {}
         const api = await factory(viewport, {
           objectId: el.dataset.object,
-          fit: el.dataset.zanimFit || 'contain',
+          fit: el.dataset.remotionFit || 'contain',
           props: authoredProps,
         });
-        const loading = el.querySelector('.zanim-loading');
+        const loading = el.querySelector('.remotion-loading');
         if (loading) loading.remove();
-        zanimInstances.set(el, api || {});
+        remotionInstances.set(el, api || {});
       } catch (error) {
-        const loading = el.querySelector('.zanim-loading');
-        if (loading) loading.textContent = `Zanim scene failed: ${error?.message || error}`;
+        const loading = el.querySelector('.remotion-loading');
+        if (loading) loading.textContent = `Remotion scene failed: ${error?.message || error}`;
       }
+    }
+    for (const el of remotionInstances.keys()) {
+      const span = timeline.slides.find(item => item.id === el.closest('[data-slide]')?.dataset.slide);
+      renderRemotionScene(el, parseRemotionInitial(el), span ? currentTime - span.start : 0);
     }
     renderAt(currentTime);
   }
-  function renderZanimScene(el, props, time) {
-    const api = zanimInstances.get(el);
+  window.addEventListener('pagehide', () => {
+    for (const api of remotionInstances.values()) api.destroy?.();
+    remotionInstances.clear();
+  });
+  window.addEventListener('pageshow', event => { if (event.persisted) mountRemotionScenes(); });
+  function renderRemotionScene(el, props, time) {
+    const api = remotionInstances.get(el);
     if (!api) return;
     try {
       if (typeof api.render === 'function') api.render(time, props);
@@ -93,15 +101,15 @@
       else if (typeof api.set === 'function') {
         for (const [key, value] of Object.entries(props)) api.set(key, value);
       }
-      el.removeAttribute('data-zanim-error');
-      el.querySelector(':scope > .zanim-runtime-error')?.remove();
+      el.removeAttribute('data-remotion-error');
+      el.querySelector(':scope > .remotion-runtime-error')?.remove();
     } catch (error) {
       const message = String(error?.message || error);
-      el.dataset.zanimError = message;
-      let box = el.querySelector(':scope > .zanim-runtime-error');
-      if (!box) { box = document.createElement('div'); box.className = 'zanim-runtime-error'; el.appendChild(box); }
-      box.textContent = `Zanim render failed: ${message}`;
-      console.error('Zanim scene render failed', el.dataset.object, error);
+      el.dataset.remotionError = message;
+      let box = el.querySelector(':scope > .remotion-runtime-error');
+      if (!box) { box = document.createElement('div'); box.className = 'remotion-runtime-error'; el.appendChild(box); }
+      box.textContent = `Remotion render failed: ${message}`;
+      console.error('Remotion scene render failed', el.dataset.object, error);
     }
   }
 
@@ -281,6 +289,9 @@
     for (const el of slide.querySelectorAll('[data-object]')) {
       if (!objectsById.has(el.dataset.object)) objectsById.set(el.dataset.object, el);
     }
+    for (const [id, el] of objectsById) {
+      if (el.dataset.kind === 'remotion' && !groups.has(id)) groups.set(id, []);
+    }
     cache = {
       slide, slideClips, groups, needsBaseFrames, objectsById,
       resetElements: [...resetIds].map(id => objectsById.get(id)).filter(Boolean),
@@ -298,7 +309,7 @@
     for (const el of runtime.resetElements) resetObject(el);
     // Layout reads are expensive and force synchronization with style changes.
     // Only fit_to() needs physical browser rectangles; ordinary code focus,
-    // Zanim animation and opacity motion stay entirely layout-read-free here.
+    // Remotion animation and opacity motion stay entirely layout-read-free here.
     const baseFrames = new Map();
     if (runtime.needsBaseFrames) {
       for (const item of runtime.slideObjects) {
@@ -335,7 +346,7 @@
       let pulseProgress = 0;
       let mathReveal = null;
       let fitState = null;
-      let zanimState = el.dataset.kind === 'zanim' ? parseZanimInitial(el) : null;
+      let remotionState = el.dataset.kind === 'remotion' ? parseRemotionInitial(el) : null;
 
       for (const clip of clips) {
         const p = progress(clip, time);
@@ -397,17 +408,17 @@
         } else if (clip.op === 'set') {
           // An instant clip has a 1ms span. Its start may equal the preceding
           // step's stop: do not apply the next step before it has been entered.
-          if (zanimState && time >= clip.end) {
+          if (remotionState && time >= clip.end) {
             const key = String(args.name || 'value');
-            zanimState[key] = args.value;
+            remotionState[key] = args.value;
           }
         } else if (clip.op === 'animate') {
-          if (zanimState && time >= clip.start) {
+          if (remotionState && time >= clip.start) {
             const key = String(args.name || 'value');
             const to = args.to;
-            const from = args.from ?? zanimState[key] ?? 0;
-            if (typeof from === 'number' && typeof to === 'number') zanimState[key] = from + (to - from) * p;
-            else zanimState[key] = p < 1 ? from : to;
+            const from = args.from ?? remotionState[key] ?? 0;
+            if (typeof from === 'number' && typeof to === 'number') remotionState[key] = from + (to - from) * p;
+            else remotionState[key] = p < 1 ? from : to;
           }
         } else {
           throw new Error(`Unsupported SODA motion op: ${clip.op}`);
@@ -418,7 +429,7 @@
         opacity, clipRight, tx, ty, scale, scaleX: scale * scaleX, scaleY: scale * scaleY, rotation, revealY, brightness, hasClipPath,
       });
       el.classList.toggle('motion-focus', focused);
-      if (zanimState) renderZanimScene(el, zanimState, time - span.start);
+      if (remotionState) renderRemotionScene(el, remotionState, time - span.start);
       if (mathReveal !== null) {
         // Typst draws fraction/radical rules as paths alongside glyph groups.
         // Reveal the complete mathematical expression together: SVG storage
@@ -457,7 +468,7 @@
         setBand(focusBand, focusGeometry, focusBandOpacity);
         setBand(pulseBand, selectionGeometry(pulseSelection), pulseProgress);
 
-        // Match the old zanim-slides behavior: focus is primarily one moving
+        // Preserve the existing slide focus behavior: focus is primarily one moving
         // attention band. Source text stays stable unless dim_inactive=true is
         // explicitly authored. When dimming is requested, use the continuous
         // focus interval instead of cross-fading discrete line states.
@@ -627,7 +638,7 @@
       if (!sourceRect.width || !sourceRect.height || !targetRect.width || !targetRect.height) continue;
       if (sourceEl.dataset.kind === 'region' && targetEl.dataset.kind === 'region') {
         // A region owns only its presentation surface; its children are distinct
-        // objects and stay with their respective pages. This mirrors Zanim's
+        // objects and stay with their respective pages. This preserves the original
         // explicit object identity instead of implicitly replacing a subtree.
         sourceEl.classList.add('shared-surface-hidden');
         targetEl.classList.add('shared-surface-hidden');
@@ -801,6 +812,7 @@
     }
     syncVideoVisibility();
     updateHud(currentTime);
+    updateSpeakerNotes();
     scrub.value = String(currentTime);
     return currentTime;
   }
@@ -1013,7 +1025,75 @@
     }
   }
 
+  const outline = document.querySelector('.soda-outline');
+  const notesPanel = document.querySelector('.soda-notes');
+  const pages = runtime.pages || [];
+  const jumpHistory = [];
+  let notesPage = null;
+  const zh = document.documentElement.lang.startsWith('zh');
+  function updateSpeakerNotes() {
+    if (!notesPanel || notesPanel.hidden) return;
+    const span = staticSpanAt(currentTime);
+    if (!span || notesPage === span.id) return;
+    notesPage = span.id;
+    const page = pages.find(item => item.id === span.id);
+    const heading = document.createElement('h2');
+    heading.textContent = page?.title || span.id;
+    const text = document.createElement('div');
+    text.className = 'soda-notes-text';
+    if (page?.notes_html) {
+      // Compiled by the safe Markdown renderer (raw HTML disabled).
+      text.innerHTML = page.notes_html;
+    } else {
+      text.textContent = page?.notes || (zh ? '本页没有备注。' : 'No notes for this slide.');
+    }
+    const close = document.createElement('button');
+    close.textContent = zh ? '关闭备注 (N)' : 'Close notes (N)';
+    close.onclick = () => { notesPanel.hidden = true; };
+    notesPanel.replaceChildren(close, heading, text);
+  }
+  function jumpToSlide(id) {
+    const span = spanById.get(id);
+    if (!span) return false;
+    jumpHistory.push(currentTime);
+    seek(span.start);
+    return true;
+  }
+  function returnFromJump() {
+    if (jumpHistory.length) seek(jumpHistory.pop());
+  }
+  function openOutline() {
+    if (outline.open) { outline.close(); return; }
+    const heading = document.createElement('h2');
+    heading.textContent = zh ? '页面目录 · B 返回跳转前的讲解位置' : 'Slides · B returns to your previous position';
+    const close = document.createElement('button');
+    close.textContent = zh ? '关闭 (Esc)' : 'Close (Esc)';
+    close.onclick = () => outline.close();
+    const list = document.createElement('ol');
+    for (const [index, page] of pages.entries()) {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.textContent = `${index + 1}. ${page.title}`;
+      button.onclick = () => { jumpToSlide(page.id); outline.close(); };
+      li.append(button); list.append(li);
+    }
+    outline.replaceChildren(close, heading, list);
+    outline.showModal();
+  }
+
   document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    if (outline.open) return;
+    if (e.key.toLowerCase() === 'o') {
+      e.preventDefault(); openOutline(); return;
+    }
+    if (e.key.toLowerCase() === 'n') {
+      e.preventDefault(); notesPanel.hidden = !notesPanel.hidden;
+      notesPage = null; updateSpeakerNotes(); return;
+    }
+    if (e.key.toLowerCase() === 'b') {
+      e.preventDefault(); returnFromJump(); return;
+    }
     if (e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown') {
       e.preventDefault(); navigate(1);
     } else if (e.key==='ArrowLeft' || e.key==='PageUp') {
@@ -1032,7 +1112,7 @@
   hydrateEmbeddedSlides();
   slideRenderCache.clear();
   renderAt(0);
-  mountZanimScenes();
+  mountRemotionScenes();
 
   // Public random-access renderer. No forward/backward lifecycle state exists:
   // every frame is reconstructed solely from absolute presentation time.
@@ -1040,6 +1120,8 @@
     renderAt: seek,
     seek,
     animateTo,
+    jumpToSlide,
+    returnFromJump,
     get time() { return currentTime; },
     get duration() { return timeline.total_duration; },
     stops: timeline.stops,

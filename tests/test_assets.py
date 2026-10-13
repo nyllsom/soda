@@ -39,6 +39,16 @@ def test_relative_assets_are_resolved_from_each_zmd_and_exported(tmp_path: Path)
     assert "muted" in html
     assert " loop " not in html
     assert "data-fit='cover'" in html
+    assert 'data-expand="true"' in html
+
+
+def test_image_expand_is_default_and_can_be_disabled():
+    default = compile_project([SourceUnit("deck.md", "## Demo\n![](hero.png)\n")], [])
+    compact = compile_project(
+        [SourceUnit("deck.md", "## Demo\n![](hero.png) {expand=false}\n")], []
+    )
+    assert 'data-expand="true"' in render_html(default)
+    assert 'data-expand="false"' in render_html(compact)
 
 
 def test_https_assets_are_preserved_without_export(tmp_path: Path):

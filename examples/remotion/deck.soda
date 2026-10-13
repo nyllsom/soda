@@ -1,0 +1,24 @@
+motion icon {
+    step "图标入场" {
+        wait 1600ms;
+    }
+    step "更新文字" {
+        check.set(name = "label", value = "可以继续讲解");
+    }
+}
+
+motion chart {
+    step "显示增长" {
+        bars.set(name = "label", value = "增长后");
+        bars.animate(name = "progress", from = 0, to = 1, duration = 1800ms, easing = LINEAR);
+    }
+    step "恢复基线" {
+        bars.animate(name = "progress", from = 1, to = 0, duration = 1000ms);
+        bars.set(name = "label", value = "初始值");
+    }
+}
+
+flow {
+    intro -> icon using cut();
+    icon -> chart using fade(duration = 300ms);
+}

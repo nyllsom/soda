@@ -16,10 +16,10 @@ from soda.compiler.typesys import (
     GROUP,
     IMAGE,
     MATH,
+    REMOTION_SCENE,
     SLIDE_OBJECT,
     TEXT,
     VIDEO,
-    ZANIM_SCENE,
     Type,
 )
 
@@ -162,7 +162,7 @@ _KIND_TYPE: dict[str, Type] = {
     "typst": IMAGE,
     "pdf": IMAGE,
     "video": VIDEO,
-    "zanim": ZANIM_SCENE,
+    "remotion": REMOTION_SCENE,
     "web": SLIDE_OBJECT,
     "columns": GROUP,
     "rows": GROUP,

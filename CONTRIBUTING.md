@@ -24,7 +24,7 @@ npm 包携带 Python 源码，启动器调用本机 Python，直接加载随包�
 
 帮助统一通过 `writeHelp()` 输出，使用终端的基础 ANSI 色板，不添加依赖。TTY 默认着色，管道、重定向和 `TERM=dumb` 默认纯文本；支持 `NO_COLOR`、`FORCE_COLOR`。着色不改变原文、空格或换行。
 
-Markdown 决定内容和布局，`.soda` 引用已有对象安排动作。编译器将动作转换为绝对时间区间，播放器按当前时间求画面，因此可以回退和任意跳转。`src/soda/vendor/` 是随包携带的 Zanim Web 运行时及许可。
+Markdown 决定内容和布局，`.soda` 引用已有对象安排动作。编译器将动作转换为绝对时间区间，播放器按当前时间求画面，因此可以回退和任意跳转。`src/soda/html/remotion-player.js` 用 Remotion Player 接入 React 组件；npm 携带 React、Remotion 和 esbuild。`html/NOTICE` 保留派生播放器的原始许可。
 
 ## 本地开发
 
@@ -53,9 +53,9 @@ npm pack
 python -m build
 ```
 
-`examples/preview/` 的四份 HTML 与源码一并提交。这让 Git 安装后的 `soda example` 立即可用，安装者无需 Typst 或 Python 来构建范例。修改示例、主题或播放器后，重新生成预览，在浏览器中检查 D 面板和重要动画中间帧。
+`examples/preview/` 的六份 HTML 与源码一并提交。这让 Git 安装后的 `soda example` 立即可用，安装者无需 Typst 或 Python 来构建范例。修改示例、主题或播放器后，重新生成预览，在浏览器中检查 D 面板和重要动画中间帧。
 
-`npm pack` 生成 `.tgz`，Python 构建在 `dist/` 生成 wheel。分发前，在仓库外用临时 npm 安装目录检查 CLI、范例预览、源码复制和实际导出；打包内容必须包含两个主题、标识及 Zanim WASM，不能包含虚拟环境和构建工具二进制。
+`npm pack` 生成 `.tgz`，Python 构建在 `dist/` 生成 wheel。分发前，在仓库外用临时 npm 安装目录检查 CLI、范例预览、源码复制和实际导出；打包内容必须包含两个主题、标识、Remotion 适配器及许可 NOTICE，不能包含虚拟环境和构建工具二进制。
 
 版本号在 `package.json`、`pyproject.toml`、`src/soda/_version.py` 中保持一致。推送到 GitHub 后，可用 `npm install -g git+https://github.com/nyllsom/soda.git && soda help` 安装并查看用法；公开仓库无需 SSH 密钥。本项目当前通过 Git 分发，不需要向 npm registry 发布。
 

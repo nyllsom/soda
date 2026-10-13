@@ -137,7 +137,7 @@ $$ {#loss font_size=36 color=foreground align=left}
 下面是可放进 Markdown 的写法；`assets/` 下的文件需由自己的项目提供。路径相对 Markdown 所在目录，HTTPS 地址则作为远程引用保留。
 
 ```markdown
-![结果](assets/result.png) {#figure fit=contain caption="验证结果"}
+![结果](assets/result.png) {#figure fit=contain expand caption="验证结果"}
 @video assets/demo.mp4 {poster=assets/poster.png controls=true muted=true}
 @typst assets/pipeline.typ {page=1}
 @pdf assets/note.pdf {page=1}
@@ -145,6 +145,8 @@ $$ {#loss font_size=36 color=foreground align=left}
 @embed assets/policy.py {type=code lines=2:5}
 @slide detail {#preview}
 ```
+
+图片默认 `expand=true`：占满当前布局区域的剩余空间，并按 `fit=contain` 保持比例放大。需要固定的紧凑高度时写 `expand=false`；`fit=cover` 可用于允许裁切的满框图片。
 
 `@embed` 根据扩展名识别类型，也可以明确指定 `type`。`@slide detail` 引用的是同一份演示中 ID 为 `detail` 的页面，适合用作后续页面的预览。
 
@@ -162,7 +164,7 @@ input["输入"] -> encoder["编码"] -> output["输出"]
 
 文献需要在 Markdown 开头声明 `bibliography: assets/references.bib`，正文用 `[@文献键]` 或 `@cite 文献键` 引用，`@references` 列出参考文献。普通 Markdown 表格下方单独写 `{#results}`，则行和单元格分别可用 `results_r1`、`results_r1_c2` 等名称控制。
 
-**参数驱动的图形**用 `@zanim scene.js {#koch iteration=0}` 引入。场景导出 `mount(container, context)`，返回可实现 `render(time, props)` 和 `destroy()` 的对象；写法参照 [scene.js](showcase/scene.js)。在动画文件中可用：
+**参数驱动的图形**用 `@remotion scene.js {#koch iteration=0}` 引入。场景默认导出 React 组件，可使用 `useCurrentFrame()`；导出 `config = {width, height, fps, durationInFrames}` 配置画布；写法参照 [scene.js](showcase/scene.js)。在动画文件中可用：
 
 ```soda
 motion scene {
@@ -171,7 +173,7 @@ motion scene {
 }
 ```
 
-这对应展示中 ID 为 `scene` 的页面。单文件导出本地场景需要 esbuild；依赖设置见 [完整展示](showcase/README.md#修改并重新生成)。
+这对应展示中 ID 为 `scene` 的页面。npm 安装已包含 React、Remotion 与 esbuild；帧动画、打包和迁移详见 [Remotion 教程](remotion/README.md)。
 
 ## Python API
 
@@ -288,6 +290,28 @@ soda deck.md --theme theme.json
 | :--- | :--- | :--- |
 | SVG | `stroke="var(--soda-primary)"` | [curve.svg](showcase/assets/curve.svg) |
 | Typst | `rgb(sys.inputs.at("soda-primary", default: "#315b85"))` | [pipeline.typ](showcase/assets/pipeline.typ) |
-| JavaScript 场景 | 从 `getComputedStyle(container)` 读取 `--soda-primary` | [scene.js](showcase/scene.js) |
+| JavaScript 场景 | 在组件样式中使用 `var(--soda-primary)` | [scene.js](showcase/scene.js) |
 
 常用变量还有 `surface`（块背景）、`foreground`（正文）、`muted`（次要文字）和 `accent`（第二强调色）。写死的色值、照片和视频不会被自动改色。
+
+## 讲者备注与问答导航
+
+在任意页面加入备注块；其中的标题不会创建新页面，内容也不参与幻灯片布局：
+
+```markdown
+::: notes
+**补充证据**、讲解提示或实验条件。
+
+- 可以使用列表、链接、表格和代码块。
+- 也可以用 `~~删除线~~` 等标准 Markdown 格式。
+:::
+```
+
+备注使用标准 Markdown 渲染（段落、粗斜体、列表、链接、图片、表格、引用、代码块、删除线等），多个块按出现顺序合并。
+不支持 Markdown 标题（`#`、`##`、下划线标题等）或 SODA 的指令、布局属性；这些写法会报错。代码块里的相同字样仅作为代码显示。原始 HTML 被转义，不执行脚本。
+
+- `O`：打开页面目录，选择标题跳转。
+- `B`：返回目录跳转前的时间位置，可连续返回。
+- `N`：打开或关闭当前页备注。
+
+备注是同窗口面板，不是私密双屏演讲者模式；投影时关闭面板。备注内容包含在导出的 HTML 中，分享前请检查是否适合公开。

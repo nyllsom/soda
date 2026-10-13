@@ -24,6 +24,7 @@ test('topic and subcommand help share offline content', () => {
     ['theme', [['theme', '--help'], ['theme'], ['theme', 'init', '--help']], /primary/],
     ['example', [['example', '--help']], /--copy/],
     ['check', [['check', '--help'], ['check']], /--static/],
+    ['preview', [['preview', '--help'], ['preview']], /自动重新编译/],
   ];
   for (const [topic, alternatives, content] of cases) {
     const expected = run(['help', topic]);

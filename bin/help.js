@@ -6,6 +6,7 @@ export function overviewHelp(version) {
   soda example quickstart --copy my-talk     复制入门源码
   cd my-talk
   soda deck.md                              编译得到 deck.html
+  soda preview deck.md                      热更新预览，保存后自动刷新
 
 内容写在 .md，动画写在可选的同名 .soda；生成的 HTML 可直接分享。
 编译用法：soda <deck.md> [motion.soda] [-o output.html]
@@ -13,6 +14,7 @@ export function overviewHelp(version) {
 按需查看帮助：
   soda help                 整体用法（也可用 soda --help）
   soda help compile         编译、动画、输出位置与依赖
+  soda help preview         热更新预览与自动定位
   soda help theme           自定义主题：生成、修改、应用
   soda help example         预览和复制范例
   soda help check           检查稿件
@@ -55,6 +57,7 @@ export const compileHelp = `SODA · 编译帮助
   场景打包工具 esbuild 已由 npm 安装。
 
 编译后用浏览器打开 HTML；远程网页与媒体仍需联网。
+播放：空格/方向键前进后退，O 目录，N 同屏备注，B 返回跳转前位置，D 布局检查。
 只检查内容和时间轴：soda check deck.md
 自定义主题的完整流程：soda help theme
 soda html … 与 soda compile … 等效；加 --help 可再次查看本页。

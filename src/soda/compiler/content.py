@@ -9,12 +9,13 @@ from urllib.parse import urlparse
 
 from soda.compiler.diagnostics import Diagnostic, ParseError
 from soda.compiler.span import Span
+from soda.notes import find_notes_close, invalid_notes_line
 
 _ATTR_RE = re.compile(r"\s*\{([^{}]*)\}\s*$")
 _HEADING_RE = re.compile(r"^(#{1,6})(?:[ \t]+(.*?))?[ \t]*$")
 _IMAGE_RE = re.compile(r"^!\[([^\]]*)\]\(([^)]+)\)\s*(\{[^{}]*\})?\s*$")
 _VIDEO_RE = re.compile(r'^@video\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
-_ZANIM_RE = re.compile(r'^@zanim\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
+_REMOTION_RE = re.compile(r'^@remotion\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
 _TYPST_RE = re.compile(r'^@typst\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
 _PDF_RE = re.compile(r'^@pdf\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
 _WEB_RE = re.compile(r'^@web\s+(?:"([^"]+)"|(\S+))\s*(\{[^{}]*\})?\s*$')
@@ -136,6 +137,7 @@ class _ContentParser:
         result: list[_HeadingInfo] = []
         in_fence = False
         in_math = False
+        notes_end = -1
         frontmatter_end = -1
         first_nonempty = next((i for i, raw in enumerate(self.lines) if raw.strip()), None)
         if first_nonempty is not None and self.lines[first_nonempty].strip() == "---":
@@ -155,6 +157,13 @@ class _ContentParser:
             if in_math:
                 if stripped.startswith("$$"):
                     in_math = False
+                continue
+            if line <= notes_end:
+                continue
+            if stripped == "::: notes":
+                notes_end = find_notes_close(self.lines, line + 1, len(self.lines)) or -1
+                if notes_end < line:
+                    self._error(line, "unterminated ::: notes block")
                 continue
             if stripped.startswith("```"):
                 in_fence = True
@@ -385,6 +394,21 @@ class _ContentParser:
             if not stripped:
                 i += 1
                 continue
+            if stripped == "::: notes":
+                close = find_notes_close(self.lines, i + 1, end)
+                if close is None:
+                    self._error(i, "unterminated ::: notes block")
+                assert self.current_slide is not None
+                props = self.current_slide.root.props
+                text = "".join(self.lines[i + 1:close])
+                invalid = invalid_notes_line(text)
+                if invalid is not None:
+                    relative_line, message = invalid
+                    self._error(i + relative_line + 1, message)
+                text = text.strip()
+                props["speaker_notes"] = "\n\n".join(filter(None, [props.get("speaker_notes", ""), text]))
+                i = close + 1
+                continue
             fence = _FENCE_RE.match(stripped)
             if fence:
                 i = self._parse_code(i, end, parent, fence.group(1) or "text", fence.group(2))
@@ -494,12 +518,14 @@ class _ContentParser:
                 self._add_object(parent, i, kind, props, explicit_id=oid)
                 i += 1
                 continue
-            zanim = _ZANIM_RE.match(stripped)
-            if zanim:
-                oid, attrs = self._attrs_from_group(zanim.group(3), i)
-                src = zanim.group(1) if zanim.group(1) is not None else zanim.group(2)
+            if re.match(r"^@zanim(?:\s|$)", stripped):
+                self._error(i, "@zanim is no longer supported; use @remotion with a React component")
+            remotion = _REMOTION_RE.match(stripped)
+            if remotion:
+                oid, attrs = self._attrs_from_group(remotion.group(3), i)
+                src = remotion.group(1) if remotion.group(1) is not None else remotion.group(2)
                 assert src is not None
-                self._add_object(parent, i, "zanim", {"src": src, **attrs}, explicit_id=oid)
+                self._add_object(parent, i, "remotion", {"src": src, **attrs}, explicit_id=oid)
                 i += 1
                 continue
             embed = _EMBED_RE.match(stripped)
@@ -623,8 +649,8 @@ class _ContentParser:
         aliases = {
             "image": "image",
             "video": "video",
-            "zanim": "zanim",
-            "scene": "zanim",
+            "remotion": "remotion",
+            "scene": "remotion",
             "typst": "typst",
             "pdf": "pdf",
             "web": "web",
@@ -634,7 +660,7 @@ class _ContentParser:
             kind = aliases.get(str(explicit).lower())
             if kind is None:
                 self._error(
-                    line, "@embed type must be image, video, zanim, typst, pdf, web, or code"
+                    line, "@embed type must be image, video, remotion, typst, pdf, web, or code"
                 )
             if kind == "web" and urlparse(src).scheme != "https":
                 self._error(line, "@embed type=web requires an https:// URL")
@@ -646,8 +672,8 @@ class _ContentParser:
             return "image"
         if suffix in {".mp4", ".webm", ".mov", ".m4v", ".ogv"}:
             return "video"
-        if suffix in {".js", ".mjs"}:
-            return "zanim"
+        if suffix in {".js", ".mjs", ".jsx", ".ts", ".tsx"}:
+            return "remotion"
         if suffix == ".typ":
             return "typst"
         if suffix == ".pdf":
@@ -679,7 +705,7 @@ class _ContentParser:
             return "code-file"
         self._error(
             line,
-            "cannot infer @embed type from the source; add type=image|video|zanim|typst|pdf|web|code",
+            "cannot infer @embed type from the source; add type=image|video|remotion|typst|pdf|web|code",
         )
 
     def _parse_chart(
@@ -844,7 +870,7 @@ class _ContentParser:
                 or _IMAGE_RE.match(stripped)
                 or _VIDEO_RE.match(stripped)
                 or _EMBED_RE.match(stripped)
-                or _ZANIM_RE.match(stripped)
+                or _REMOTION_RE.match(stripped)
                 or _TYPST_RE.match(stripped)
                 or _PDF_RE.match(stripped)
                 or _WEB_RE.match(stripped)
@@ -857,6 +883,7 @@ class _ContentParser:
                 or self._looks_like_table(i, end)
                 or _RULE_RE.match(stripped)
                 or stripped == "$$"
+                or stripped == "::: notes"
                 or stripped.startswith(">")
                 or _UL_RE.match(raw)
                 or _OL_RE.match(raw)

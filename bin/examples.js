@@ -6,14 +6,14 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { writeHelp } from './terminal.js';
 
-const examples = new Set(['quickstart', 'showcase']);
+const examples = new Set(['quickstart', 'showcase', 'remotion']);
 export const exampleHelp = `SODA · 范例帮助
 
   soda example                              打开范例目录
   soda example showcase --theme ipads        直接查看某个范例和主题
   soda example quickstart --copy my-talk     复制可编辑源码
 
-范例：quickstart（四页入门）、showcase（十四页完整展示）。
+范例：quickstart（四页入门）、showcase（十四页完整展示）、remotion（图标与图表动画教学）。
 预览与复制无需 Python；复制时省略名称默认 quickstart，不覆盖已有目录。
 进入复制的目录后运行 soda deck.md；编译细节见 soda help compile。
 
@@ -29,6 +29,7 @@ const types = {
   '.py': 'text/plain; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.pdf': 'application/pdf',
   '.mp4': 'video/mp4', '.csv': 'text/plain; charset=utf-8', '.bib': 'text/plain; charset=utf-8',
+  '.tsx': 'text/plain; charset=utf-8', '.jsx': 'text/plain; charset=utf-8',
   '.typ': 'text/plain; charset=utf-8',
 };
 
@@ -85,7 +86,7 @@ export async function runExample(packageRoot, argv) {
     return;
   }
   const name = positionals[0];
-  if (positionals.length > 1 || (name && !examples.has(name))) throw new Error('示例名请选择 quickstart 或 showcase。');
+  if (positionals.length > 1 || (name && !examples.has(name))) throw new Error('示例名请选择 quickstart、showcase 或 remotion。');
   if (values.theme && !['nju', 'ipads'].includes(values.theme)) throw new Error('示例主题请选择 nju 或 ipads。');
   if (values.copy && (values.theme || values.port || values['no-open'])) throw new Error('--copy 不与预览选项同时使用；复制后可修改 deck.md 的主题。');
   const root = await realpath(path.join(packageRoot, 'examples'));

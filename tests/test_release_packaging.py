@@ -1,18 +1,15 @@
 import json
 from pathlib import Path
 
-from soda.html.render import _esbuild_executable, _esbuild_names, _zanim_web_root
+from soda.html.render import _esbuild_executable, _esbuild_names, _remotion_node_modules
 
 
-def test_release_contains_complete_vendored_zanim_web(monkeypatch):
-    monkeypatch.delenv("ZANIM_WEB_ROOT", raising=False)
-    root = _zanim_web_root()
-    assert root.name == "zanim_web"
-    assert (root / "src" / "zanim.js").is_file()
-    assert (root / "dist" / "zanim_web_core.wasm").stat().st_size > 0
-    metadata = json.loads((root / "package.json").read_text(encoding="utf-8"))
-    assert metadata["name"] == "@zanim/web"
-    assert metadata["version"] == "0.1.0-beta.1"
+def test_release_contains_remotion_dependencies():
+    root = _remotion_node_modules()
+    player = json.loads((root / "@remotion/player/package.json").read_text())
+    remotion = json.loads((root / "remotion/package.json").read_text())
+    assert player["version"] == remotion["version"]
+    assert not Path("src/soda/vendor/zanim_web").exists()
 
 
 def test_esbuild_finds_project_local_node_modules(monkeypatch, tmp_path: Path):

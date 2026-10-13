@@ -5,8 +5,10 @@ description = "A Markdown presentation compiler with optional declarative motion
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
-license-files = ["LICENSE", "src/soda/vendor/zanim_web/LICENSE"]
-dependencies = []
+license-files = ["LICENSE", "src/soda/html/NOTICE"]
+dependencies = [
+    "markdown-it-py>=4,<5",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.16", "build>=1"]
@@ -17,9 +19,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/soda"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"src/soda/vendor/zanim_web/dist/zanim_web_core.wasm" = "soda/vendor/zanim_web/dist/zanim_web_core.wasm"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

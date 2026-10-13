@@ -16,7 +16,7 @@ soda deck.md -o showcase.html
 soda deck.md --theme ipads -o showcase-ipads.html
 ```
 
-编译需要 Python 3.12+。**Typst** 用于公式和 `.typ` 插图，让 `typst` 在 PATH 中可用，或设置 `SODA_TYPST` 为可执行文件路径。esbuild 已包含在 npm 依赖中，无需单独安装；如需覆盖，可设置 `SODA_ESBUILD`。
+编译需要 Python 3.12+。**Typst** 用于公式和 `.typ` 插图，让 `typst` 在 PATH 中可用，或设置 `SODA_TYPST` 为可执行文件路径。React、Remotion 与 esbuild 已包含在 npm 依赖中，无需单独安装；如需覆盖，可设置 `SODA_ESBUILD`。
 
 编译细节见 `soda help compile`。自定义配色与标识：`soda help theme` 查看写法，`soda theme init --from ipads` 生成配置，修改后用 `soda deck.md --theme theme.json` 应用。`soda theme --reference` 提供离线字段说明。
 
@@ -40,6 +40,6 @@ soda deck.md --theme ipads -o showcase-ipads.html
 
 默认只分享 HTML。本地素材已内嵌；网页示例仍需联网，并受目标站点的嵌入策略限制。浏览器若不支持内嵌 PDF，可使用页面中的打开链接。
 
-网站部署用 `soda deck.md --target web -o dist/index.html`，同时上传 HTML 和 `assets/`。这一模式无需 esbuild，重新编译本例仍需要 Typst。
+网站部署用 `soda deck.md --target web -o dist/index.html`，同时上传 HTML 和 `assets/`。Remotion 组件仍通过 esbuild 内嵌；重新编译本例还需要 Typst。
 
-在源码仓库中执行 `npm run examples:build`，可更新两份范例的四个主题预览。Python API 的等效构建见 [build.py](build.py)。
+在源码仓库中执行 `npm run examples:build`，可更新三份范例的六个主题预览。Python API 的等效构建见 [build.py](build.py)。

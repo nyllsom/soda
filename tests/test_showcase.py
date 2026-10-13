@@ -23,7 +23,7 @@ def test_showcase_covers_public_objects_motion_and_flow():
     assert {
         "heading", "paragraph", "list", "quote", "rule", "region", "columns", "rows",
         "grid", "stack", "overlay", "table", "table-row", "table-cell", "math", "code",
-        "code-file", "image", "video", "typst", "pdf", "web", "zanim", "slide-ref",
+        "code-file", "image", "video", "typst", "pdf", "web", "remotion", "slide-ref",
         "chart", "chart-series", "diagram", "diagram-node", "diagram-edge",
         "citation", "references",
     } <= rendered

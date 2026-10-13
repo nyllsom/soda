@@ -186,7 +186,7 @@ input["输入"] -> encoder["编码"] -> output["输出"]
 ### 声明场景，编排参数
 
 ```markdown {line_numbers=false}
-@zanim scene.js {#koch iteration=0}
+@remotion scene.js {#koch iteration=0}
 ```
 
 ```soda {#scene_code line_numbers=true}
@@ -200,9 +200,9 @@ koch.set(name = "iteration", value = 1);
 
 复杂图形在场景模块里实现；SODA 负责演讲时间线。
 
-### 实际的 Zanim Web 场景
+### 实际的 Remotion 场景
 
-@zanim scene.js {#koch iteration=0}
+@remotion scene.js {#koch iteration=0}
 
 局部动画、公式、图形与代码共享演讲步骤。
 
